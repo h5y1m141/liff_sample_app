@@ -6,13 +6,7 @@ import {
   OAuthProvider,
   signInWithRedirect,
 } from 'firebase/auth'
-import {
-  getDoc,
-  collection,
-  doc,
-  getDocs,
-  getFirestore,
-} from 'firebase/firestore'
+import { getDoc, doc, getFirestore } from 'firebase/firestore'
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import { firebaseApp } from '@/src/app/firebase'
 
