@@ -8,9 +8,9 @@ import { firebaseApp } from '@/src/app/firebase'
 type dataType = {
   name: string
 }
-export const Restaurants: FC = () => {
+export const Restaurant: FC = () => {
   const authContext = useAuthContext()
-  const [data, setData] = useState<dataType[]>()
+  const [data, setData] = useState<dataType>()
   useEffect(() => {
     ;(async () => {
       const collectionName = 'restaurants'
@@ -20,20 +20,17 @@ export const Restaurants: FC = () => {
         const docRef = doc(db, collectionName, docName)
         const docSnap = await getDoc(docRef)
 
-        if (docSnap.exists()) setData([docSnap.data()] as unknown as dataType[])
+        if (docSnap.exists()) setData(docSnap.data() as unknown as dataType)
       }
     })()
   }, [authContext.user?.uid])
 
   return (
     <>
-      <h1>Restaurants</h1>
-      <h2>取得件数：{data?.length}</h2>
-      {data && data?.length > 0 && (
+      <h1>店舗詳細</h1>
+      {data && (
         <>
-          {data.map((item) => {
-            return <div key={item.name}>{item.name}</div>
-          })}
+          <div key={data.name}>{data.name}</div>
         </>
       )}
     </>
