@@ -1,5 +1,4 @@
 import LineUser from './LineUser'
-import UsersList from './UserList'
 
 async function Page() {
   return (
