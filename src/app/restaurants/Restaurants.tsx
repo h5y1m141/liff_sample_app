@@ -1,6 +1,6 @@
 'use client'
 
-import { getDoc, doc, getFirestore } from 'firebase/firestore'
+import { getDocs, collection, getFirestore, query } from 'firebase/firestore'
 import React, { useEffect, useState, FC } from 'react'
 import { useAuthContext } from '@/src/app/context/auth'
 import { firebaseApp } from '@/src/app/firebase'
@@ -14,13 +14,14 @@ export const Restaurants: FC = () => {
   useEffect(() => {
     ;(async () => {
       const collectionName = 'restaurants'
-      const docName = 'XIpaOhYvMDWQ6oefKiOn'
+
       if (authContext.user?.uid) {
         const db = getFirestore(firebaseApp)
-        const docRef = doc(db, collectionName, docName)
-        const docSnap = await getDoc(docRef)
+        const restaurantsQuery = query(collection(db, collectionName))
+        const querySnapshot = await getDocs(restaurantsQuery)
+        const docSnap = querySnapshot.docs.map((doc) => doc.data())
 
-        if (docSnap.exists()) setData([docSnap.data()] as unknown as dataType[])
+        if (docSnap.length > 0) setData(docSnap as unknown as dataType[])
       }
     })()
   }, [authContext.user?.uid])
