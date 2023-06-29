@@ -1,12 +1,11 @@
 import React from 'react'
 
-import { Restaurants } from './Restaurants'
+import { Restaurant } from './Restaurant'
 
 async function Page() {
   return (
     <>
-      <h1>レストラン一覧</h1>
-      <Restaurants />
+      <Restaurant />
     </>
   )
 }
