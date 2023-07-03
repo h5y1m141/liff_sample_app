@@ -1,36 +1,44 @@
 'use client'
 
-import liff from '@line/liff'
+import type { User } from 'firebase/auth'
+import { getAuth, OAuthProvider, signInWithRedirect } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
+import { useAuthContext } from '@/src/app/context/auth'
+import { firebaseApp } from '@/src/app/firebase'
+
+const provider = new OAuthProvider('oidc.restaurants')
+const auth = getAuth(firebaseApp)
 
 const LineUser = () => {
   const router = useRouter()
-  const [loggedIn, setLoggedIn] = useState(false)
-  const [loggedInStatus, setLoggedInStatus] = useState('')
+  const [user, setUser] = useState<User>()
+  const authContext = useAuthContext()
+
+  const handleSignIn = useCallback(() => {
+    signInWithRedirect(auth, provider)
+  }, [])
 
   useEffect(() => {
     ;(async () => {
-      const liffId = `${process.env.NEXT_PUBLIC_LIFF_ID}`
-      await liff.init({ liffId })
-      // console.info('LIFF init', liff.isLoggedIn())
-
-      if (!liff.isLoggedIn()) liff.login({})
-      setLoggedIn(liff.isLoggedIn())
-
-      liff.isLoggedIn()
-        ? setLoggedInStatus('ログイン済み')
-        : setLoggedInStatus('未ログイン')
+      if (authContext.user) setUser(authContext.user)
     })()
-  }, [])
+  }, [authContext.user])
 
   return (
     <>
-      <h1>LINEログイン状態：{loggedInStatus}</h1>
-      {loggedIn && (
-        <button type='button' onClick={() => router.push('/restaurants')}>
-          レストラン一覧を確認
-        </button>
+      {user ? (
+        <>
+          <h1>LINEログイン済</h1>
+          <p>user: {user.displayName}</p>
+          <button type='button' onClick={() => router.push('/restaurants')}>
+            レストラン一覧を確認
+          </button>
+        </>
+      ) : (
+        <>
+          <button onClick={() => handleSignIn()}>LINEログイン</button>
+        </>
       )}
     </>
   )
