@@ -1,0 +1,17 @@
+rules_version = '2';
+
+service cloud.firestore {
+
+ function isAuth(){
+    //reequest.authで認証情報を取得。認証していなければnullとなる。
+    return request.auth.uid != null;
+  }
+
+  match /databases/{database}/documents {
+    match /restaurants/{restaurantId} {
+      allow get: if isAuth()
+      allow list: if isAuth()
+      allow write: if isAuth()
+    }
+  }
+}
