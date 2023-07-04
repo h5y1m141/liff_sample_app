@@ -6,18 +6,25 @@ import {
   assertFails,
 } from '@firebase/rules-unit-testing'
 
-import { collection, doc, getDoc, setDoc } from 'firebase/firestore'
+import {
+  collection,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+} from 'firebase/firestore'
 import { v4 as uuidv4 } from 'uuid'
 
 const rulesPath = resolve(__dirname, '../../firestore.rules')
 const rules = readFileSync(rulesPath, 'utf8')
-
-// const projectId = 'test-project-' + uuidv4()
 const projectId = 'fortnite-news-1698d'
+// const projectId = 'test-project-' + uuidv4()
 let testEnv: RulesTestEnvironment
 const uid = uuidv4()
-const collectionName = 'restaurants'
+const restaurantCollectionName = 'restaurants'
+const userCollectionName = 'users'
 const docId = uuidv4()
+const reservationId = uuidv4()
 
 export const initTest = async () => {
   const env = await initializeTestEnvironment({
@@ -52,11 +59,11 @@ const getDB = () => {
   return { clientDB, guestClientDB }
 }
 
-describe('ドキュメントの取得', () => {
+describe('restaurantsコレクション配下のドキュメントの取得', () => {
   beforeEach(async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
       const admin = context.firestore()
-      const col = collection(admin, collectionName)
+      const col = collection(admin, restaurantCollectionName)
       const docRef = doc(col, docId)
       await setDoc(docRef, { name: 'レストラン１' })
 
@@ -77,5 +84,74 @@ describe('ドキュメントの取得', () => {
     const testCol = collection(guestClientDB, 'restaurants')
     const docRef = doc(testCol, docId)
     await assertFails(getDoc(docRef))
+  })
+})
+
+describe('usersコレクション配下のドキュメントの取得', () => {
+  beforeEach(async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const admin = context.firestore()
+      const col = collection(admin, userCollectionName)
+      const docRef = doc(col, uid)
+      await setDoc(docRef, { name: 'ユーザー１' })
+
+      return Promise.resolve()
+    })
+  })
+
+  it('認証済みで条件を満たす場合は可能', async () => {
+    const { clientDB } = getDB()
+    const testCol = collection(clientDB, 'users')
+    const docRef = doc(testCol, uid)
+    const docSnap = await getDoc(docRef)
+    expect(docSnap.exists()).toBe(true)
+  })
+
+  it('認証してない場合は不可能', async () => {
+    const { guestClientDB } = getDB()
+    const testCol = collection(guestClientDB, 'users')
+    const docRef = doc(testCol, uid)
+    await assertFails(getDoc(docRef))
+  })
+  describe('reservationsコレクション配下のドキュメントの取得', () => {
+    beforeEach(async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const admin = context.firestore()
+        const col1 = collection(admin, userCollectionName)
+        const docRef1 = doc(col1, uid)
+        await setDoc(docRef1, { name: 'ユーザー１' })
+
+        const col2 = collection(
+          admin,
+          `${userCollectionName}/${uid}/reservations`,
+        )
+        const docRef2 = doc(col2, reservationId)
+        console.info('before', reservationId)
+        await setDoc(docRef2, {
+          visit_date: 'レストラン２',
+          created_at: serverTimestamp(),
+        })
+
+        return Promise.resolve()
+      })
+    })
+
+    it('認証済みで条件を満たす場合は可能', async () => {
+      const { clientDB } = getDB()
+      const testCol = collection(
+        clientDB,
+        `${userCollectionName}/${uid}/reservations`,
+      )
+      const docRef = doc(testCol, reservationId)
+      const docSnap = await getDoc(docRef)
+      expect(docSnap.exists()).toBe(true)
+    })
+
+    it('認証してない場合は不可能', async () => {
+      const { guestClientDB } = getDB()
+      const testCol = collection(guestClientDB, 'users')
+      const docRef = doc(testCol, uid)
+      await assertFails(getDoc(docRef))
+    })
   })
 })
