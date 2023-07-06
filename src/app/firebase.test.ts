@@ -24,6 +24,7 @@ const uid = uuidv4()
 const restaurantCollectionName = 'restaurants'
 const userCollectionName = 'users'
 const docId = uuidv4()
+const addressId = uuidv4()
 const reservationId = uuidv4()
 
 export const initTest = async () => {
@@ -84,6 +85,42 @@ describe('restaurantsコレクション配下のドキュメントの取得', ()
     const testCol = collection(guestClientDB, 'restaurants')
     const docRef = doc(testCol, docId)
     await assertFails(getDoc(docRef))
+  })
+  describe('サブコレクションのaddressの取得', () => {
+    beforeEach(async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const admin = context.firestore()
+        const col = collection(
+          admin,
+          `${restaurantCollectionName}/${docId}/address`,
+        )
+        const docRef = doc(col, addressId)
+        await setDoc(docRef, { prefecture: '東京都' })
+
+        return Promise.resolve()
+      })
+    })
+
+    it('認証済みで条件を満たす場合は可能', async () => {
+      const { clientDB } = getDB()
+      const testCol = collection(
+        clientDB,
+        `${restaurantCollectionName}/${docId}/address`,
+      )
+      const docRef = doc(testCol, addressId)
+      const docSnap = await getDoc(docRef)
+      expect(docSnap.exists()).toBe(true)
+    })
+
+    it('認証してない場合は不可能', async () => {
+      const { guestClientDB } = getDB()
+      const testCol = collection(
+        guestClientDB,
+        `${restaurantCollectionName}/${docId}/address`,
+      )
+      const docRef = doc(testCol, docId)
+      await assertFails(getDoc(docRef))
+    })
   })
 })
 

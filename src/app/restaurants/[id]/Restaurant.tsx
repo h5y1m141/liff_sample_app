@@ -1,26 +1,42 @@
 'use client'
 
+import type { User } from 'firebase/auth'
 import {
   collection,
   getDocs,
   getDoc,
   doc,
   getFirestore,
+  addDoc,
+  serverTimestamp,
 } from 'firebase/firestore'
-import { useParams } from 'next/navigation'
+
+import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useState, FC, useCallback } from 'react'
 import { useAuthContext } from '@/src/app/context/auth'
 import { firebaseApp } from '@/src/app/firebase'
 import { RestaurantType } from '@/src/app/restaurants/Restaurants'
 
 export const Restaurant: FC = () => {
+  const router = useRouter()
   const params = useParams()
   const authContext = useAuthContext()
+  const [user, setUser] = useState<User>()
   const [restaurantId, setRestaurantId] = useState('')
   const [restaurant, setRestaurant] = useState<RestaurantType>()
-  const handleReservation = useCallback(() => {
-    console.log('handleReservation')
-  }, [])
+
+  const handleReservation = useCallback(async () => {
+    if (!user?.uid) return
+
+    const db = getFirestore(firebaseApp)
+    const colRef = collection(db, `users/${user.uid}/reservations`)
+    const restaurantRef = doc(db, 'restaurants', restaurantId)
+    const docRef = await addDoc(colRef, {
+      restaurant: restaurantRef,
+      created_at: serverTimestamp(),
+    })
+    if (docRef) return router.push(`/restaurants`)
+  }, [restaurantId, router, user])
 
   useEffect(() => {
     const id = params.id
@@ -28,10 +44,14 @@ export const Restaurant: FC = () => {
   }, [params])
 
   useEffect(() => {
+    if (authContext.user) setUser(authContext.user)
+  }, [authContext.user])
+
+  useEffect(() => {
     ;(async () => {
       const collectionName = 'restaurants'
 
-      if (authContext.user?.uid && restaurantId !== '') {
+      if (user?.uid && restaurantId !== '') {
         const db = getFirestore(firebaseApp)
         const docRef = doc(db, collectionName, restaurantId)
         const docSnapshot = await getDoc(docRef)
@@ -52,7 +72,7 @@ export const Restaurant: FC = () => {
         }
       }
     })()
-  }, [authContext.user?.uid, restaurantId])
+  }, [restaurantId, user?.uid])
 
   return (
     <>
