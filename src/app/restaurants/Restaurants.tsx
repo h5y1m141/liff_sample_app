@@ -1,18 +1,12 @@
 'use client'
 
-import {
-  getDocs,
-  getDoc,
-  collection,
-  getFirestore,
-  query,
-} from 'firebase/firestore'
+import { getDocs, collection, getFirestore } from 'firebase/firestore'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState, FC } from 'react'
 import { useAuthContext } from '@/src/app/context/auth'
 import { firebaseApp } from '@/src/app/firebase'
 
-type Restaurant = {
+export type RestaurantType = {
   id: string
   name: string
   phone: string
@@ -21,7 +15,7 @@ type Restaurant = {
 export const Restaurants: FC = () => {
   const router = useRouter()
   const authContext = useAuthContext()
-  const [restaurants, setRestaurants] = useState<Restaurant[]>()
+  const [restaurants, setRestaurants] = useState<RestaurantType[]>()
 
   useEffect(() => {
     ;(async () => {
@@ -33,7 +27,7 @@ export const Restaurants: FC = () => {
         const restaurantCollection = collection(db, collectionName)
         const restaurantSnapshot = await getDocs(restaurantCollection)
 
-        const loadedRestaurants: Restaurant[] = []
+        const loadedRestaurants: RestaurantType[] = []
         for (const doc of restaurantSnapshot.docs) {
           const name = doc.get('name')
           const phone = doc.get('phone')
@@ -63,6 +57,7 @@ export const Restaurants: FC = () => {
               <th>店舗名</th>
               <th>店舗連絡先</th>
               <th>住所</th>
+              <th>アクション</th>
             </tr>
           </thead>
           <tbody>
@@ -73,6 +68,17 @@ export const Restaurants: FC = () => {
                   <td>{restaurant.name}</td>
                   <td>{restaurant.phone}</td>
                   <td>{restaurant.prefecture}</td>
+                  <td>
+                    {' '}
+                    <button
+                      type='button'
+                      onClick={() =>
+                        router.push(`/restaurants/${restaurant.id}`)
+                      }
+                    >
+                      レストラン詳細
+                    </button>
+                  </td>
                 </tr>
               )
             })}

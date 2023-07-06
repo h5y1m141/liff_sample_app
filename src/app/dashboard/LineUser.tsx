@@ -30,6 +30,7 @@ const LineUser = () => {
       {user ? (
         <>
           <h1>LINEログイン済</h1>
+          <p>uid: {user.uid}</p>
           <p>user: {user.displayName}</p>
           <button type='button' onClick={() => router.push('/restaurants')}>
             レストラン一覧を確認
