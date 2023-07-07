@@ -1,3 +1,4 @@
+import FirebaseUser from './FirebaseUser'
 import LineUser from './LineUser'
 
 async function Page() {
@@ -5,6 +6,7 @@ async function Page() {
     <>
       <h1>ダッシュボード</h1>
       <LineUser />
+      <FirebaseUser />
     </>
   )
 }
