@@ -163,7 +163,6 @@ describe('usersコレクション配下のドキュメントの取得', () => {
           `${userCollectionName}/${uid}/reservations`,
         )
         const docRef2 = doc(col2, reservationId)
-        console.info('before', reservationId)
         await setDoc(docRef2, {
           visit_date: 'レストラン２',
           created_at: serverTimestamp(),

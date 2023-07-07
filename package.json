@@ -9,9 +9,8 @@
     "dev": "next dev -p 3333",
     "build": "next build",
     "start": "next start",
-    "test": "jest",
-    "test:firebase": "jest --config jest.config.firebase.js",
-    "test:rules": "firebase emulators:exec --only firestore 'npx jest --detectOpenHandles'",
+    "test:firebase": "jest --config jest.config.firebase.js --detectOpenHandles",
+    "test:rules": "firebase emulators:exec --only firestore 'npx jest --detectOpenHandles --config jest.config.firebase.js'",
     "lint": "next lint",
     "lint:types": "tsc --noEmit"
   },
