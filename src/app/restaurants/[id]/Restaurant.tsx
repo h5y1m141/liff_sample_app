@@ -12,7 +12,7 @@ import {
 } from 'firebase/firestore'
 
 import { useParams, useRouter } from 'next/navigation'
-import React, { useEffect, useState, FC, useCallback } from 'react'
+import React, { useEffect, useState, FC, useCallback, Suspense } from 'react'
 import { useAuthContext } from '@/src/app/context/auth'
 import { firebaseApp } from '@/src/app/firebase'
 import { RestaurantType } from '@/src/app/restaurants/Restaurants'
@@ -77,17 +77,19 @@ export const Restaurant: FC = () => {
   return (
     <>
       <h1>店舗詳細</h1>
-      {restaurant && (
-        <div key={restaurant.id}>
-          <h2>店舗名：{restaurant.name}</h2>
-          <h3>詳細情報</h3>
-          <ul>
-            <li>電話番号：{restaurant.phone}</li>
-            <li>住所：{restaurant.prefecture}</li>
-          </ul>
-          <button onClick={handleReservation}>このお店を予約する</button>
-        </div>
-      )}
+      <Suspense fallback={<div>店舗情報を読み込んでます...</div>}>
+        {restaurant && (
+          <div key={restaurant.id}>
+            <h2>店舗名：{restaurant.name}</h2>
+            <h3>詳細情報</h3>
+            <ul>
+              <li>電話番号：{restaurant.phone}</li>
+              <li>住所：{restaurant.prefecture}</li>
+            </ul>
+            <button onClick={handleReservation}>このお店を予約する</button>
+          </div>
+        )}
+      </Suspense>
     </>
   )
 }
