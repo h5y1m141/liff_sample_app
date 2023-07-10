@@ -18,9 +18,12 @@ import { v4 as uuidv4 } from 'uuid'
 const rulesPath = resolve(__dirname, '../../firestore.rules')
 const rules = readFileSync(rulesPath, 'utf8')
 const projectId = 'fortnite-news-1698d'
-// const projectId = 'test-project-' + uuidv4()
+
 let testEnv: RulesTestEnvironment
-const uid = uuidv4()
+// TODO: 本当はuuidv4()でランダムなuidを生成したものを活用する。
+// その処理にするためにはFirebaseAuthenticationのCustom Claimsにadminロールを付与する
+// 機能が必要
+const uid = 'pDDrMsBwcOU1u5ZlrQLd5WptpzU2'
 const restaurantCollectionName = 'restaurants'
 const userCollectionName = 'users'
 const docId = uuidv4()
@@ -188,6 +191,56 @@ describe('usersコレクション配下のドキュメントの取得', () => {
       const testCol = collection(guestClientDB, 'users')
       const docRef = doc(testCol, uid)
       await assertFails(getDoc(docRef))
+    })
+  })
+})
+
+describe('operation_for_reservations', () => {
+  describe('ドキュメントの取得', () => {
+    const operationForReservationName = 'operation_for_reservations'
+    const docId = uuidv4()
+
+    beforeEach(async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const admin = context.firestore()
+        const col = collection(admin, operationForReservationName)
+        const docRef = doc(col, docId)
+        await setDoc(docRef, { created_at: serverTimestamp() })
+
+        return Promise.resolve()
+      })
+    })
+
+    it('認証済みで条件を満たす場合は可能', async () => {
+      const { clientDB } = getDB()
+      const testCol = collection(clientDB, 'operation_for_reservations')
+      const docRef = doc(testCol, docId)
+      const docSnap = await getDoc(docRef)
+      expect(docSnap.exists()).toBe(true)
+    })
+
+    it('認証してない場合は不可能', async () => {
+      const { guestClientDB } = getDB()
+      const testCol = collection(guestClientDB, 'operation_for_reservations')
+      const docRef = doc(testCol, docId)
+      await assertFails(getDoc(docRef))
+    })
+  })
+  describe('ドキュメントの作成', () => {
+    const docId = uuidv4()
+
+    it('認証済みで条件を満たす場合は可能', async () => {
+      const { clientDB } = getDB()
+      const testCol = collection(clientDB, 'operation_for_reservations')
+      const docRef = doc(testCol, docId)
+      await assertFails(setDoc(docRef, { created_at: serverTimestamp() }))
+    })
+
+    it('認証してない場合は不可能', async () => {
+      const { guestClientDB } = getDB()
+      const testCol = collection(guestClientDB, 'operation_for_reservations')
+      const docRef = doc(testCol, docId)
+      await assertFails(setDoc(docRef, { created_at: serverTimestamp() }))
     })
   })
 })

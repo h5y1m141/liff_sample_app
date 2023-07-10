@@ -9,6 +9,10 @@ service cloud.firestore {
     return isAuth() && request.auth.uid == uid;
   }
 
+  function isAdmin(){
+    return request.auth.uid == 'pDDrMsBwcOU1u5ZlrQLd5WptpzU2' || request.auth.uid == 'Fxbfs0rhFRX8IQUqksJedKhLilQ2';
+  }
+
   match /databases/{database}/documents {
     match /restaurants/{restaurantId} {
       allow get: if isAuth()
@@ -29,6 +33,10 @@ service cloud.firestore {
         allow list: if isOwner(uid)
         allow create: if isOwner(uid)
       }
+    }
+    match /operation_for_reservations/{operationId} {
+      allow get: if isAdmin()
+      allow list: if isAdmin()
     }
   }
 }
