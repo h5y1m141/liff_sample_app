@@ -32,3 +32,17 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## ローカルの Firestore に対してテストデータを登録する
+
+```sh
+firebase emulators:start
+```
+
+でローカルの Firestore のエミュレーターを起動しておきます。
+
+その上で以下のように実行することでテストデータを投入できます
+
+```sh
+node scripts/seed_bookable_tables.js '{"startDatetime": "2023-07-12T11:00:00.000Z","endDatetime": "2023-07-14T14:00:00.000Z","duration": 1,"availableReservationRequests": 4, "restaurantId": "restaurants10"}'
+```
