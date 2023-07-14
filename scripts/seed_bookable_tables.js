@@ -122,9 +122,10 @@ const main = async () => {
     availableReservationRequests,
   } = prepareParams()
   let currentDatetime = startDatetime
+  const id = await createRestaurantDocument(restaurantName)
+  await createRestaurantAddressDocument(id)
+
   while (currentDatetime.isBefore(endDatetime)) {
-    const id = await createRestaurantDocument(restaurantName)
-    await createRestaurantAddressDocument(id)
     const start = currentDatetime.toDate()
     const end = currentDatetime.add(duration, 'hour').toDate()
     await createBookableTableDocument(
