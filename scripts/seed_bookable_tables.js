@@ -10,7 +10,6 @@ const serviceAccount = require(process.env
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'http://localhost:8080',
 })
 
 const prepareParams = () => {
