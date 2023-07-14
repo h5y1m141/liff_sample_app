@@ -3,6 +3,7 @@ const Ajv = require('ajv')
 const addFormats = require('ajv-formats')
 const dayjs = require('dayjs')
 const admin = require('firebase-admin')
+const v4 = require('uuid').v4
 
 // Firebase Admin SDKの初期化
 const serviceAccount = require(process.env
@@ -24,14 +25,14 @@ const prepareParams = () => {
       endDatetime: { type: 'string', format: 'date-time' },
       duration: { type: 'integer', minimum: 1 },
       availableReservationRequests: { type: 'integer', minimum: 1 },
-      restaurantId: { type: 'string' },
+      restaurantName: { type: 'string' },
     },
     required: [
       'startDatetime',
       'endDatetime',
       'duration',
       'availableReservationRequests',
-      'restaurantId',
+      'restaurantName',
     ],
     additionalProperties: false,
   }
@@ -53,27 +54,25 @@ const prepareParams = () => {
   const availableReservationRequests = parseInt(
     args.availableReservationRequests,
   )
-  // Firestoreのコレクションのパス
-  const restaurantId = args.restaurantId
-  const collectionPath = `restaurants/${restaurantId}/bookable_tables`
+  const restaurantName = args.restaurantName
 
   return {
+    restaurantName,
     startDatetime,
     endDatetime,
     duration,
     availableReservationRequests,
-    collectionPath,
   }
 }
 
-// Firestoreにデータを登録する関数
 const createBookableTableDocument = async (
+  id,
   start,
   end,
   availableReservationRequests,
-  collectionPath,
 ) => {
   try {
+    const collectionPath = `restaurants/${id}/bookable_tables`
     await admin.firestore().collection(collectionPath).add({
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       startDatetime: start,
@@ -85,24 +84,54 @@ const createBookableTableDocument = async (
   }
 }
 
+const createRestaurantDocument = async (restaurantName) => {
+  try {
+    const restaurantId = (
+      await admin
+        .firestore()
+        .collection('restaurants')
+        .add({
+          name: `${restaurantName}`,
+          phone: `090-1234-3456`,
+        })
+    ).id
+    return restaurantId
+  } catch (error) {
+    console.error('Error adding document: ', error)
+  }
+}
+
+const createRestaurantAddressDocument = async (restaurantId) => {
+  try {
+    await admin
+      .firestore()
+      .collection(`restaurants/${restaurantId}/address`)
+      .add({ prefecture: '東京都' })
+  } catch (error) {
+    console.error('Error adding document: ', error)
+  }
+}
+
 // Firestoreにデータを登録
 const main = async () => {
   const {
+    restaurantName,
     startDatetime,
     endDatetime,
     duration,
     availableReservationRequests,
-    collectionPath,
   } = prepareParams()
   let currentDatetime = startDatetime
   while (currentDatetime.isBefore(endDatetime)) {
+    const id = await createRestaurantDocument(restaurantName)
+    await createRestaurantAddressDocument(id)
     const start = currentDatetime.toDate()
     const end = currentDatetime.add(duration, 'hour').toDate()
     await createBookableTableDocument(
+      id,
       start,
       end,
       availableReservationRequests,
-      collectionPath,
     )
     currentDatetime = currentDatetime.add(duration, 'hour')
   }
