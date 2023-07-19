@@ -50,3 +50,7 @@ node scripts/seed_bookable_tables.js '{"startDatetime": "2023-07-12T11:00:00.000
 ## staging
 
 ステージング環境用のブランチがあるのでそちらを利用する
+
+## production
+
+本番環境用のブランチがあるのでそちらを利用する
