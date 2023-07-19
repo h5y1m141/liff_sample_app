@@ -46,3 +46,11 @@ firebase emulators:start
 ```sh
 node scripts/seed_bookable_tables.js '{"startDatetime": "2023-07-12T11:00:00.000Z","endDatetime": "2023-07-14T14:00:00.000Z","duration": 1,"availableReservationRequests": 4, "restaurantId": "restaurants10"}'
 ```
+
+## staging
+
+ステージング環境用のブランチがあるのでそちらを利用する
+
+## production
+
+本番環境用のブランチがあるのでそちらを利用する
