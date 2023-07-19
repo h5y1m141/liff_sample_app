@@ -6,11 +6,18 @@ import React, { useEffect, useState, FC } from 'react'
 import { useAuthContext } from '@/src/app/context/auth'
 import { firebaseApp } from '@/src/app/firebase'
 
+export type BookableTableType = {
+  id: string
+  start_datetime: string
+  end_datetime: string
+  available_reservation_requests: number
+}
 export type RestaurantType = {
   id: string
   name: string
   phone: string
   prefecture: string
+  bookableTables?: BookableTableType[]
 }
 export const Restaurants: FC = () => {
   const router = useRouter()

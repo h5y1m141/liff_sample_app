@@ -23,6 +23,10 @@ service cloud.firestore {
         allow get: if isAuth()
         allow list: if isAuth()
       }
+      match /bookable_tables/{tableId} {
+        allow get: if isAuth()
+        allow list: if isAuth()
+      }
     }
     match /users/{uid} {
       allow get: if isAuth()

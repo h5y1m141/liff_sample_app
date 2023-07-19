@@ -24,6 +24,7 @@ export const useAuthContext = () => {
 
 export const AuthComponent = ({ children }: AuthProps) => {
   const auth = getAuth(firebaseApp)
+  const [isChecking, setIsChecking] = useState(true)
   const [user, setUser] = useState<User>()
   const value = {
     user,
@@ -31,6 +32,7 @@ export const AuthComponent = ({ children }: AuthProps) => {
 
   useEffect(() => {
     const authStateChanged = onAuthStateChanged(auth, async (user) => {
+      setIsChecking(false)
       if (user) {
         setUser(user)
       }
@@ -39,6 +41,9 @@ export const AuthComponent = ({ children }: AuthProps) => {
       authStateChanged()
     }
   }, [auth])
+
+  if (isChecking) return <div>Loading....</div>
+  if (!user) return <div>LINEログインが完了していません</div>
 
   return (
     <AuthComponentContext.Provider value={value}>
