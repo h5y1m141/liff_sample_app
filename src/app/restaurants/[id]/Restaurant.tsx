@@ -11,7 +11,6 @@ import {
   getFirestore,
   addDoc,
   serverTimestamp,
-  FieldValue,
 } from 'firebase/firestore'
 
 import { useParams, useRouter } from 'next/navigation'
