@@ -6,7 +6,7 @@ admin.initializeApp()
 export const copyReservationToOperation = functions.firestore
   .document('/users/{userId}/reservations/{reservationId}')
   .onCreate(async (snapshot, context) => {
-    const { userId, reservationId } = context.params
+    const { reservationId } = context.params
     const reservationData = snapshot.data()
     const operationForReservationRef = admin
       .firestore()

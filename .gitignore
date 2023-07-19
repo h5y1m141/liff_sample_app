@@ -36,3 +36,7 @@ firestore-debug.log
 *.tsbuildinfo
 next-env.d.ts
 .firebaserc
+
+# VScode
+
+.vscode/**/*
