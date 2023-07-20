@@ -26,6 +26,7 @@ service cloud.firestore {
       match /bookable_tables/{tableId} {
         allow get: if isAuth()
         allow list: if isAuth()
+        allow update: if isAuth()
       }
     }
     match /users/{uid} {
