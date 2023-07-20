@@ -6,11 +6,11 @@ import {
   collection,
   getDocs,
   getDoc,
-  updateDoc,
   doc,
   getFirestore,
   addDoc,
   serverTimestamp,
+  runTransaction,
 } from 'firebase/firestore'
 
 import { useParams, useRouter } from 'next/navigation'
@@ -21,40 +21,13 @@ import {
   RestaurantType,
   BookableTableType,
 } from '@/src/app/restaurants/Restaurants'
+
 export const Restaurant: FC = () => {
-  const router = useRouter()
   const params = useParams()
   const authContext = useAuthContext()
   const [user, setUser] = useState<User>()
   const [restaurantId, setRestaurantId] = useState('')
   const [restaurant, setRestaurant] = useState<RestaurantType>()
-
-  const handleReservation = useCallback(
-    async (id: string) => {
-      if (!user?.uid) return
-
-      const db = getFirestore(firebaseApp)
-      const colRef = collection(db, `users/${user.uid}/reservations`)
-      const restaurantRef = doc(db, 'restaurants', restaurantId)
-      const docRef = await addDoc(colRef, {
-        restaurant: restaurantRef,
-        created_at: serverTimestamp(),
-      })
-
-      const bookableTableRef = doc(
-        db,
-        `restaurants/${restaurantId}/bookable_tables`,
-        id,
-      )
-
-      await updateDoc(bookableTableRef, {
-        available_reservation_requests: 0,
-      })
-
-      if (docRef) return router.push(`/restaurants`)
-    },
-    [restaurantId, router, user],
-  )
 
   useEffect(() => {
     const id = params.id
@@ -112,6 +85,80 @@ export const Restaurant: FC = () => {
     })()
   }, [restaurantId, user?.uid])
 
+  if (!restaurant || !user || !restaurantId)
+    return <div>店舗情報を読み込んでます...</div>
+
+  return (
+    <Container
+      restaurantId={restaurantId}
+      restaurant={restaurant}
+      user={user}
+    />
+  )
+}
+
+type ContainerProps = {
+  restaurantId: string
+  restaurant: RestaurantType
+  user: User
+}
+
+const Container: FC<ContainerProps> = ({ user, restaurant, restaurantId }) => {
+  const router = useRouter()
+  const handleReservation = useCallback(
+    async (id: string) => {
+      if (!user?.uid) return
+
+      const db = getFirestore(firebaseApp)
+
+      try {
+        await runTransaction(db, async (transaction) => {
+          const bookableTableRef = doc(
+            db,
+            `restaurants/${restaurantId}/bookable_tables`,
+            id,
+          )
+          const bookableTableDoc = await transaction.get(bookableTableRef)
+
+          if (!bookableTableDoc.exists()) throw 'Document does not exist!'
+
+          if (bookableTableDoc.data().available_reservation_requests > 0) {
+            await transaction.update(bookableTableRef, {
+              available_reservation_requests: 0,
+            })
+            const colRef = collection(db, `users/${user.uid}/reservations`)
+            const restaurantRef = doc(db, 'restaurants', restaurantId)
+            await addDoc(colRef, {
+              restaurant: restaurantRef,
+              created_at: serverTimestamp(),
+            })
+            return router.push(`/restaurants`)
+          } else {
+            alert(
+              `現在の予約可能な残席数が${
+                bookableTableDoc.data().available_reservation_requests
+              }になったため予約申請に失敗しました`,
+            )
+          }
+        })
+      } catch (e) {
+        console.log('Transaction failed: ', e)
+        alert('予約申請に失敗しました')
+      }
+    },
+    [restaurantId, router, user],
+  )
+
+  return (
+    <Screen restaurant={restaurant} handleReservation={handleReservation} />
+  )
+}
+
+type ScreenProps = {
+  restaurant: RestaurantType
+  handleReservation: (id: string) => void
+}
+const Screen: FC<ScreenProps> = ({ restaurant, handleReservation }) => {
   return (
     <>
       <h1>店舗詳細</h1>
@@ -129,6 +176,7 @@ export const Restaurant: FC = () => {
                 <tr>
                   <th>開始日時</th>
                   <th>終了日時</th>
+                  <th>残席数</th>
                   <th>予約</th>
                 </tr>
               </thead>
@@ -139,14 +187,19 @@ export const Restaurant: FC = () => {
                     <tr key={bookableTable.id}>
                       <td>{bookableTable.start_datetime}</td>
                       <td>{bookableTable.end_datetime}</td>
+                      <td>{bookableTable.available_reservation_requests}</td>
                       <td>
-                        <button
-                          onClick={() => {
-                            handleReservation(bookableTable.id)
-                          }}
-                        >
-                          この日時で予約申請する
-                        </button>
+                        {bookableTable.available_reservation_requests !== 0 ? (
+                          <button
+                            onClick={() => {
+                              handleReservation(bookableTable.id)
+                            }}
+                          >
+                            この日時で予約申請する
+                          </button>
+                        ) : (
+                          '予約申請できません'
+                        )}
                       </td>
                     </tr>
                   ))}
