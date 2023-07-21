@@ -15,7 +15,10 @@
     "lint:types": "tsc --noEmit"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
     "@line/liff": "^2.22.2",
+    "@mui/material": "^5.14.1",
     "@types/node": "18.11.19",
     "@types/react": "18.2.14",
     "@types/react-dom": "18.2.6",

@@ -20,7 +20,7 @@ import { firebaseApp } from '@/src/app/firebase'
 import {
   RestaurantType,
   BookableTableType,
-} from '@/src/app/restaurants/Restaurants'
+} from '@/src/app/liff/restaurants/Restaurants'
 
 export const Restaurant: FC = () => {
   const params = useParams()
@@ -132,7 +132,7 @@ const Container: FC<ContainerProps> = ({ user, restaurant, restaurantId }) => {
               restaurant: restaurantRef,
               created_at: serverTimestamp(),
             })
-            return router.push(`/restaurants`)
+            return router.push(`/liff/restaurants`)
           } else {
             alert(
               `現在の予約可能な残席数が${
