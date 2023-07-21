@@ -80,7 +80,7 @@ export const Restaurants: FC = () => {
                     <button
                       type='button'
                       onClick={() =>
-                        router.push(`/restaurants/${restaurant.id}`)
+                        router.push(`/liff/restaurants/${restaurant.id}`)
                       }
                     >
                       レストラン詳細
