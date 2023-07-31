@@ -41,5 +41,6 @@
   "exclude": [
     "node_modules",
     "functions",
+    "rest_base_sample",
   ]
 }
