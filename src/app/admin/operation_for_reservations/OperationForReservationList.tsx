@@ -14,7 +14,7 @@ import React, { useEffect, useState, FC, Suspense } from 'react'
 import { useAuthContext } from '@/src/app/context/auth'
 import { firebaseApp } from '@/src/app/firebase'
 
-type OperationForReservationType = {
+export type OperationForReservationType = {
   id: string
   created_at: string
 }
@@ -54,24 +54,27 @@ export const OperationForReservationList: FC = () => {
     <>
       <Suspense fallback={<div>店舗情報を読み込んでます...</div>}>
         {reservations && reservations.length > 0 && (
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>申請日</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reservations.map((reservation) => {
-                return (
-                  <tr key={reservation.id}>
-                    <td>{reservation.id}</td>
-                    <td>{reservation.created_at}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+          <>
+            <h1>予約一覧</h1>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>申請日</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reservations.map((reservation) => {
+                  return (
+                    <tr key={reservation.id}>
+                      <td>{reservation.id}</td>
+                      <td>{reservation.created_at}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </>
         )}
       </Suspense>
     </>
