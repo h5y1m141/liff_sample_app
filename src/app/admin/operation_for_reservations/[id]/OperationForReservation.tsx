@@ -1,50 +1,13 @@
 'use client'
 
-import { getDoc, doc, getFirestore } from 'firebase/firestore'
-import { useParams } from 'next/navigation'
-import React, {
-  FC,
-  useEffect,
-  useState,
-  useRef,
-  Suspense,
-  useCallback,
-} from 'react'
+import React, { FC, useRef, Suspense, useCallback } from 'react'
 import { useReactToPrint } from 'react-to-print'
 
 import { OperationForReservationType } from '../OperationForReservationList'
-import { firebaseApp } from '@/src/app/firebase'
+import { useOperationForReservation } from './useOperationForReservation'
 
 export const OperationForReservation: FC = () => {
-  const params = useParams()
-  const [operationId, setOperationId] = useState('')
-  const [operationForReservation, setOperationForReservation] =
-    useState<OperationForReservationType>()
-
-  useEffect(() => {
-    const id = params.id
-    if (typeof id === 'string') setOperationId(id)
-  }, [params])
-
-  useEffect(() => {
-    ;(async () => {
-      const collectionName = 'operation_for_reservations'
-
-      if (operationId !== '') {
-        const db = getFirestore(firebaseApp)
-        const docRef = doc(db, collectionName, operationId)
-        const docSnapshot = await getDoc(docRef)
-
-        if (docSnapshot.exists()) {
-          const item: OperationForReservationType = {
-            id: docSnapshot.id,
-            created_at: docSnapshot.get('created_at').toDate().toLocaleString(),
-          }
-          setOperationForReservation(item)
-        }
-      }
-    })()
-  }, [operationId])
+  const { operationForReservation } = useOperationForReservation()
 
   if (!operationForReservation) return <>Loading....</>
 
