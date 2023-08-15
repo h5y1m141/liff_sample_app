@@ -11,10 +11,15 @@ export class RestaurantsService {
   ) {}
 
   async findAll(): Promise<Restaurant[]> {
-    return this.restaurantRepository.find()
+    return this.restaurantRepository.find({
+      relations: ['seats'],
+    })
   }
 
   findOne(id: number): Promise<Restaurant | null> {
-    return this.restaurantRepository.findOneBy({ id })
+    return this.restaurantRepository.findOne({
+      where: { id },
+      relations: ['seats'],
+    })
   }
 }
