@@ -3,7 +3,9 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { RestaurantsModule } from './restaurants/restaurants.module'
+import { SeatsModule } from './seats/seats.module'
 import { Restaurant } from './restaurants/restaurants.entity'
+import { Seat } from './seats/seats.entity'
 import { ConfigModule } from '@nestjs/config'
 
 @Module({
@@ -18,10 +20,11 @@ import { ConfigModule } from '@nestjs/config'
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_DATABASE,
-      entities: [Restaurant],
+      entities: [Restaurant, Seat],
       synchronize: true,
     }),
     RestaurantsModule,
+    SeatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

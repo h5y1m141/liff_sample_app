@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
+import { Seat } from 'src/seats/seats.entity'
+import { OneToMany, Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('restaurants')
 export class Restaurant {
@@ -13,4 +14,7 @@ export class Restaurant {
 
   @Column({ type: 'timestamptz' })
   updated_at
+
+  @OneToMany(() => Seat, (seat) => seat.restaurant)
+  seats: Seat[]
 }
