@@ -20,7 +20,7 @@ import { firebaseApp } from '@/src/app/firebase'
 import {
   RestaurantType,
   BookableTableType,
-} from '@/src/app/liff/restaurants/Restaurants'
+} from '@/src/app/models/RestaurantModel'
 
 export const Restaurant: FC = () => {
   const params = useParams()
@@ -50,13 +50,10 @@ export const Restaurant: FC = () => {
         if (docSnapshot.exists()) {
           const name = docSnapshot.get('name')
           const phone = docSnapshot.get('phone')
-          const addressCollection = collection(docSnapshot.ref, 'address')
           const bookableTableCollection = collection(
             docSnapshot.ref,
             'bookable_tables',
           )
-          const addressSnapshot = await getDocs(addressCollection)
-          const prefecture = addressSnapshot.docs[0].get('prefecture')
           const bookableTables = await getDocs(bookableTableCollection)
           const items: BookableTableType[] = []
           bookableTables.docs.forEach((doc) => {
@@ -76,7 +73,6 @@ export const Restaurant: FC = () => {
             id: docSnapshot.id,
             name,
             phone,
-            prefecture,
             bookableTables: items,
           }
           setRestaurant(restaurant)
@@ -169,7 +165,6 @@ const Screen: FC<ScreenProps> = ({ restaurant, handleReservation }) => {
             <h3>詳細情報</h3>
             <ul>
               <li>電話番号：{restaurant.phone}</li>
-              <li>住所：{restaurant.prefecture}</li>
             </ul>
             <table style={{ width: 800, border: 1 }}>
               <thead>
