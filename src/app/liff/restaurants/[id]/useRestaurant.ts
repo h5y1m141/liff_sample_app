@@ -1,4 +1,3 @@
-import type { User } from 'firebase/auth'
 import {
   collection,
   getDocs,
@@ -6,9 +5,9 @@ import {
   doc,
   getFirestore,
 } from 'firebase/firestore'
-import { useParams } from 'next/navigation'
+
 import { useEffect, useState } from 'react'
-import { useAuthContext } from '@/src/app/context/auth'
+
 import { firebaseApp } from '@/src/app/firebase'
 import { BookableTableConverter } from '@/src/app/models/BookableTableModel'
 import {
@@ -16,27 +15,14 @@ import {
   RestaurantType,
 } from '@/src/app/models/RestaurantModel'
 
-export const useRestaurant = () => {
-  const params = useParams()
-  const authContext = useAuthContext()
-  const [user, setUser] = useState<User>()
-  const [restaurantId, setRestaurantId] = useState('')
+export const useRestaurant = (restaurantId: string) => {
   const [restaurant, setRestaurant] = useState<RestaurantType>()
-
-  useEffect(() => {
-    const id = params.id
-    if (typeof id === 'string') setRestaurantId(id)
-  }, [params])
-
-  useEffect(() => {
-    if (authContext.user) setUser(authContext.user)
-  }, [authContext.user])
 
   useEffect(() => {
     ;(async () => {
       const collectionName = 'restaurants'
 
-      if (user?.uid && restaurantId !== '') {
+      if (restaurantId !== '') {
         const db = getFirestore(firebaseApp)
         const docRef = doc(db, collectionName, restaurantId).withConverter(
           RestaurantConverter,
@@ -59,11 +45,9 @@ export const useRestaurant = () => {
         })
       }
     })()
-  }, [restaurantId, user?.uid])
+  }, [restaurantId])
 
   return {
-    restaurantId,
     restaurant,
-    user,
   }
 }

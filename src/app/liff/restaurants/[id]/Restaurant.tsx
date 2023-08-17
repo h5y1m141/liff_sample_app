@@ -11,14 +11,28 @@ import {
   runTransaction,
 } from 'firebase/firestore'
 
-import { useRouter } from 'next/navigation'
-import React, { FC, useCallback, Suspense } from 'react'
+import { useRouter, useParams } from 'next/navigation'
+import React, { FC, useState, useEffect, useCallback, Suspense } from 'react'
 import { useRestaurant } from './useRestaurant'
+import { useAuthContext } from '@/src/app/context/auth'
 import { firebaseApp } from '@/src/app/firebase'
 import { RestaurantType } from '@/src/app/models/RestaurantModel'
 
 export const Restaurant: FC = () => {
-  const { user, restaurant, restaurantId } = useRestaurant()
+  const params = useParams()
+  const authContext = useAuthContext()
+  const [user, setUser] = useState<User>()
+  const [restaurantId, setRestaurantId] = useState('')
+
+  useEffect(() => {
+    const id = params.id
+    if (typeof id === 'string') setRestaurantId(id)
+  }, [params])
+
+  useEffect(() => {
+    if (authContext.user) setUser(authContext.user)
+  }, [authContext.user])
+  const { restaurant } = useRestaurant(restaurantId)
 
   if (!restaurant || !user || !restaurantId)
     return <div>店舗情報を読み込んでます...</div>
