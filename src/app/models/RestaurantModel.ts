@@ -5,13 +5,8 @@ import type {
   FirestoreDataConverter,
 } from 'firebase/firestore'
 import { serverTimestamp } from 'firebase/firestore'
+import { BookableTableType } from '@/src/app/models/BookableTableModel'
 
-export type BookableTableType = {
-  id: string
-  start_datetime: string
-  end_datetime: string
-  available_reservation_requests: number
-}
 export type RestaurantType = {
   id: string
   name: string
