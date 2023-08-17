@@ -1,11 +1,9 @@
 'use client'
 
+import dayjs from 'dayjs'
 import type { User } from 'firebase/auth'
-
 import {
   collection,
-  getDocs,
-  getDoc,
   doc,
   getFirestore,
   addDoc,
@@ -13,21 +11,18 @@ import {
   runTransaction,
 } from 'firebase/firestore'
 
-import { useParams, useRouter } from 'next/navigation'
-import React, { useEffect, useState, FC, useCallback, Suspense } from 'react'
+import { useRouter, useParams } from 'next/navigation'
+import React, { FC, useState, useEffect, useCallback, Suspense } from 'react'
+import { useRestaurant } from './useRestaurant'
 import { useAuthContext } from '@/src/app/context/auth'
 import { firebaseApp } from '@/src/app/firebase'
-import {
-  RestaurantType,
-  BookableTableType,
-} from '@/src/app/liff/restaurants/Restaurants'
+import { RestaurantType } from '@/src/app/models/RestaurantModel'
 
 export const Restaurant: FC = () => {
   const params = useParams()
   const authContext = useAuthContext()
   const [user, setUser] = useState<User>()
   const [restaurantId, setRestaurantId] = useState('')
-  const [restaurant, setRestaurant] = useState<RestaurantType>()
 
   useEffect(() => {
     const id = params.id
@@ -37,53 +32,7 @@ export const Restaurant: FC = () => {
   useEffect(() => {
     if (authContext.user) setUser(authContext.user)
   }, [authContext.user])
-
-  useEffect(() => {
-    ;(async () => {
-      const collectionName = 'restaurants'
-
-      if (user?.uid && restaurantId !== '') {
-        const db = getFirestore(firebaseApp)
-        const docRef = doc(db, collectionName, restaurantId)
-        const docSnapshot = await getDoc(docRef)
-
-        if (docSnapshot.exists()) {
-          const name = docSnapshot.get('name')
-          const phone = docSnapshot.get('phone')
-          const addressCollection = collection(docSnapshot.ref, 'address')
-          const bookableTableCollection = collection(
-            docSnapshot.ref,
-            'bookable_tables',
-          )
-          const addressSnapshot = await getDocs(addressCollection)
-          const prefecture = addressSnapshot.docs[0].get('prefecture')
-          const bookableTables = await getDocs(bookableTableCollection)
-          const items: BookableTableType[] = []
-          bookableTables.docs.forEach((doc) => {
-            items.push({
-              id: doc.id,
-              start_datetime: doc
-                .data()
-                .start_datetime.toDate()
-                .toLocaleString(),
-              end_datetime: doc.data().end_datetime.toDate().toLocaleString(),
-              available_reservation_requests:
-                doc.data().available_reservation_requests,
-            })
-          })
-
-          const restaurant: RestaurantType = {
-            id: docSnapshot.id,
-            name,
-            phone,
-            prefecture,
-            bookableTables: items,
-          }
-          setRestaurant(restaurant)
-        }
-      }
-    })()
-  }, [restaurantId, user?.uid])
+  const { restaurant } = useRestaurant(restaurantId)
 
   if (!restaurant || !user || !restaurantId)
     return <div>店舗情報を読み込んでます...</div>
@@ -169,7 +118,6 @@ const Screen: FC<ScreenProps> = ({ restaurant, handleReservation }) => {
             <h3>詳細情報</h3>
             <ul>
               <li>電話番号：{restaurant.phone}</li>
-              <li>住所：{restaurant.prefecture}</li>
             </ul>
             <table style={{ width: 800, border: 1 }}>
               <thead>
@@ -185,8 +133,16 @@ const Screen: FC<ScreenProps> = ({ restaurant, handleReservation }) => {
                   restaurant.bookableTables.length > 0 &&
                   restaurant.bookableTables.map((bookableTable) => (
                     <tr key={bookableTable.id}>
-                      <td>{bookableTable.start_datetime}</td>
-                      <td>{bookableTable.end_datetime}</td>
+                      <td>
+                        {dayjs(bookableTable.start_datetime.toDate()).format(
+                          'YYYY/MM/DD HH:mm:ss',
+                        )}
+                      </td>
+                      <td>
+                        {dayjs(bookableTable.end_datetime.toDate()).format(
+                          'YYYY/MM/DD HH:mm:ss',
+                        )}
+                      </td>
                       <td>{bookableTable.available_reservation_requests}</td>
                       <td>
                         {bookableTable.available_reservation_requests !== 0 ? (
