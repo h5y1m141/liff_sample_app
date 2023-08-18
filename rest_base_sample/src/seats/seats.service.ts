@@ -2,12 +2,21 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Seat } from './seats.entity'
-import { Restaurant } from '../restaurants/restaurants.entity'
+import { IsNumber, IsNotEmpty } from 'class-validator'
 
-export type CreateSeatType = {
+export class CreateSeatDto {
+  @IsNotEmpty()
+  @IsNumber()
   number_of_seats: number
+
+  @IsNotEmpty()
   start_at: string
+
+  @IsNotEmpty()
   end_at: string
+
+  @IsNotEmpty()
+  @IsNumber()
   restaurant_id: number
 }
 
@@ -31,7 +40,7 @@ export class SeatsService {
     })
   }
 
-  async create(seat: CreateSeatType): Promise<Seat> {
+  async create(seat: CreateSeatDto): Promise<Seat> {
     return this.seatRepository.save({
       ...seat,
       start_at: new Date(seat.start_at),

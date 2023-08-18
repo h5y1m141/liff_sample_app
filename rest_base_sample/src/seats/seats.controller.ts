@@ -2,7 +2,7 @@ import { Controller, Get, Param, Post, Body } from '@nestjs/common'
 
 import { SeatsService } from './seats.service'
 import { Seat } from './seats.entity'
-import { CreateSeatType } from './seats.service'
+import { CreateSeatDto } from './seats.service'
 
 type SeatListResponse = {
   seats: Promise<Seat[]>
@@ -24,7 +24,7 @@ export class SeatsController {
   }
 
   @Post()
-  create(@Body() params: CreateSeatType): Promise<Seat> {
+  create(@Body() params: CreateSeatDto): Promise<Seat> {
     return this.seatsService.create(params)
   }
 }
