@@ -1,7 +1,8 @@
-import { Controller, Get, Param, Render } from '@nestjs/common'
+import { Controller, Get, Param, Post, Body } from '@nestjs/common'
 
 import { SeatsService } from './seats.service'
 import { Seat } from './seats.entity'
+import { CreateSeatDto } from './seats.service'
 
 type SeatListResponse = {
   seats: Promise<Seat[]>
@@ -20,5 +21,10 @@ export class SeatsController {
   @Get(':id')
   findOne(@Param('id') id: number): Promise<Seat> {
     return this.seatsService.findOne(id)
+  }
+
+  @Post()
+  create(@Body() params: CreateSeatDto): Promise<Seat> {
+    return this.seatsService.create(params)
   }
 }
