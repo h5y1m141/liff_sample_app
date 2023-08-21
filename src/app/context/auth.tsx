@@ -12,6 +12,7 @@ import { firebaseApp } from '@/src/app/firebase'
 
 export type AuthContextProps = {
   user: User
+  token: string
 }
 export type AuthProps = {
   children: ReactNode
@@ -26,8 +27,10 @@ export const AuthComponent = ({ children }: AuthProps) => {
   const auth = getAuth(firebaseApp)
   const [isChecking, setIsChecking] = useState(true)
   const [user, setUser] = useState<User>()
+  const [token, setToken] = useState<string>()
   const value = {
     user,
+    token,
   }
 
   useEffect(() => {
@@ -35,6 +38,8 @@ export const AuthComponent = ({ children }: AuthProps) => {
       setIsChecking(false)
       if (user) {
         setUser(user)
+        const token = await user?.getIdToken()
+        if (token) setToken(token)
       }
     })
     return () => {
