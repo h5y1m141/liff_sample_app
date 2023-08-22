@@ -4,28 +4,22 @@ import { AppService } from './app.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { RestaurantsModule } from './restaurants/restaurants.module'
 import { SeatsModule } from './seats/seats.module'
-import { Restaurant } from './restaurants/restaurants.entity'
-import { Seat } from './seats/seats.entity'
 import { ConfigModule } from '@nestjs/config'
 import { AuthMiddleware } from './middlewares/AuthMiddleware'
+import { ReservationsModule } from './reservations/reservations.module'
+import { TypeOrmConfigService } from './config/orm.config'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: '.env.development',
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DATABASE_HOST,
-      port: 5432,
-      username: process.env.DATABASE_USERNAME,
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_DATABASE,
-      entities: [Restaurant, Seat],
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      useClass: TypeOrmConfigService,
     }),
     RestaurantsModule,
     SeatsModule,
+    ReservationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
