@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
@@ -7,11 +7,12 @@ import { SeatsModule } from './seats/seats.module'
 import { Restaurant } from './restaurants/restaurants.entity'
 import { Seat } from './seats/seats.entity'
 import { ConfigModule } from '@nestjs/config'
+import { AuthMiddleware } from './middlewares/AuthMiddleware'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: '.development.env',
+      envFilePath: '.env.development',
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -29,4 +30,8 @@ import { ConfigModule } from '@nestjs/config'
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes('*')
+  }
+}

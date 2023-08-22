@@ -14,6 +14,7 @@ const FirebaseUser = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState<User>()
+  const [token, setToken] = useState<string>()
   const authContext = useAuthContext()
 
   const handleSignIn = useCallback(
@@ -28,6 +29,7 @@ const FirebaseUser = () => {
   useEffect(() => {
     ;(async () => {
       if (authContext.user) setUser(authContext.user)
+      if (authContext.token) setToken(authContext.token)
     })()
   }, [authContext.user])
 
@@ -38,6 +40,7 @@ const FirebaseUser = () => {
           <h1>ログイン済</h1>
           <p>uid: {user.uid}</p>
           <p>user: {user.displayName}</p>
+          <p>token: {token}</p>
           <button
             type='button'
             onClick={() => router.push('/liff/restaurants')}
