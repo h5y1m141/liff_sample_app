@@ -7,7 +7,7 @@ import { SeatsModule } from './seats/seats.module'
 import { ConfigModule } from '@nestjs/config'
 import { AuthMiddleware } from './middlewares/AuthMiddleware'
 import { ReservationsModule } from './reservations/reservations.module'
-import { TypeOrmConfigService } from './config/orm.config'
+import { TypeOrmConfigService } from './orm.config'
 
 @Module({
   imports: [

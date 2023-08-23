@@ -1,4 +1,4 @@
-import { Seat } from 'src/seats/seats.entity'
+import { Seat } from '../../seats/entities/seat.entity'
 import { OneToMany, Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('restaurants')

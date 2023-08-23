@@ -1,18 +1,6 @@
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm'
-import { DataSource } from 'typeorm'
 import { Injectable } from '@nestjs/common'
-
-export const prepareMigrationConfig = () => {
-  return new DataSource({
-    type: 'postgres',
-    host: process.env.DATABASE_HOST,
-    port: 5432,
-    username: process.env.DATABASE_USERNAME,
-    password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE_DATABASE,
-    migrations: ['migrations/*.ts'],
-  })
-}
+import { join } from 'path'
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -24,7 +12,9 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_DATABASE,
-      entities: ['src/**/*.entity'],
+      // NOTE: __dirnameが展開されると以下のようなpathの参照になる
+      // /rest_base_sample/dist/src/**/*.entity
+      entities: [join(__dirname + '/**/*.entity.{js,ts}')],
       synchronize: true,
     }
   }
