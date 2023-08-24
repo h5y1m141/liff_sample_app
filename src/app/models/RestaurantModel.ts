@@ -11,6 +11,8 @@ export type RestaurantType = {
   id: string
   name: string
   phone: string
+  latitude: number
+  longitude: number
   bookableTables?: BookableTableType[]
 }
 
@@ -19,6 +21,8 @@ export const RestaurantConverter: FirestoreDataConverter<RestaurantType> = {
     return {
       name: restaurant.name,
       phone: restaurant.phone,
+      latitude: restaurant.latitude,
+      longitude: restaurant.longitude,
       created_at: serverTimestamp(),
     }
   },
@@ -32,6 +36,8 @@ export const RestaurantConverter: FirestoreDataConverter<RestaurantType> = {
       id: snapshot.id,
       name: data.name,
       phone: data.phone,
+      latitude: data.latitude,
+      longitude: data.longitude,
     }
   },
 }

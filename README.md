@@ -40,7 +40,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 ### レストランデータ
 
 ```sh
-node scripts/seed_bookable_tables.js '{"start_datetime": "2023-07-21T11:00:00.000Z","end_datetime": "2023-07-21T16:00:00.000Z","duration": 1,"available_reservation_requests": 4, "restaurant_name": "すし一世"}'
+node scripts/seed_bookable_tables.js '{"start_datetime": "2023-08-25T11:00:00.000Z","end_datetime": "2023-08-25T16:00:00.000Z","duration": 1,"available_reservation_requests": 4, "restaurant_name": "すし田中", "latitude": 35.658034, "longitude": 139.701636}'
+
+node scripts/seed_bookable_tables.js '{"start_datetime": "2023-08-25T11:00:00.000Z","end_datetime": "2023-08-26T16:00:00.000Z","duration": 1,"available_reservation_requests": 4, "restaurant_name": "洋食こいずみ", "latitude": 35.691348, "longitude": 139.70336}'
+
+node scripts/seed_bookable_tables.js '{"start_datetime": "2023-08-25T11:00:00.000Z","end_datetime": "2023-08-28T16:00:00.000Z","duration": 1,"available_reservation_requests": 4, "restaurant_name": "てんぷら鶴吉", "latitude": 35.646715, "longitude": 139.710082 }'
 ```
 
 ### ユーザー

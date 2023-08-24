@@ -9,6 +9,7 @@ import {
   addDoc,
   serverTimestamp,
   runTransaction,
+  getDoc,
 } from 'firebase/firestore'
 
 import { useRouter, useParams } from 'next/navigation'
@@ -16,7 +17,10 @@ import React, { FC, useState, useEffect, useCallback, Suspense } from 'react'
 import { useRestaurant } from './useRestaurant'
 import { useAuthContext } from '@/src/app/context/auth'
 import { firebaseApp } from '@/src/app/firebase'
-import { RestaurantType } from '@/src/app/models/RestaurantModel'
+import {
+  RestaurantConverter,
+  RestaurantType,
+} from '@/src/app/models/RestaurantModel'
 
 export const Restaurant: FC = () => {
   const params = useParams()
@@ -76,9 +80,20 @@ const Container: FC<ContainerProps> = ({ user, restaurant, restaurantId }) => {
               available_reservation_requests: 0,
             })
             const colRef = collection(db, `users/${user.uid}/reservations`)
-            const restaurantRef = doc(db, 'restaurants', restaurantId)
+            const restaurantRef = doc(
+              db,
+              'restaurants',
+              restaurantId,
+            ).withConverter(RestaurantConverter)
+            const restaurantSnap = await getDoc(restaurantRef)
+            const restaurant = restaurantSnap.data()
+            if (!restaurant) throw 'Document does not exist!'
+
             await addDoc(colRef, {
-              restaurant: restaurantRef,
+              restaurantId: restaurantRef.id,
+              restaurantName: restaurant.name,
+              latitude: restaurant.latitude,
+              longitude: restaurant.longitude,
               created_at: serverTimestamp(),
             })
             return router.push(`/liff/restaurants`)
