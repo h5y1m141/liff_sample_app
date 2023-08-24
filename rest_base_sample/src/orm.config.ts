@@ -16,6 +16,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       // /rest_base_sample/dist/src/**/*.entity
       entities: [join(__dirname + '/**/*.entity.{js,ts}')],
       synchronize: true,
+      logging: true,
     }
   }
 }
