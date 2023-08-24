@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Render } from '@nestjs/common'
 
 import { RestaurantsService } from './restaurants.service'
-import { Restaurant } from './restaurants.entity'
+import { Restaurant } from './entities/restaurant.entity'
 
 type RestaurantListResponse = {
   restaurants: Promise<Restaurant[]>

@@ -1,8 +1,8 @@
 import { Controller, Get, Param, Post, Body } from '@nestjs/common'
 
 import { SeatsService } from './seats.service'
-import { Seat } from './seats.entity'
-import { CreateSeatDto } from './seats.service'
+import { Seat } from './entities/seat.entity'
+import { CreateSeatDto } from './dto/create-seat.dto'
 
 type SeatListResponse = {
   seats: Promise<Seat[]>

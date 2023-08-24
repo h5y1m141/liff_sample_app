@@ -1,24 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { Seat } from './seats.entity'
-import { IsNumber, IsNotEmpty } from 'class-validator'
-
-export class CreateSeatDto {
-  @IsNotEmpty()
-  @IsNumber()
-  number_of_seats: number
-
-  @IsNotEmpty()
-  start_at: string
-
-  @IsNotEmpty()
-  end_at: string
-
-  @IsNotEmpty()
-  @IsNumber()
-  restaurant_id: number
-}
+import { Seat } from './entities/seat.entity'
+import { CreateSeatDto } from './dto/create-seat.dto'
 
 @Injectable()
 export class SeatsService {

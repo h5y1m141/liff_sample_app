@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
 } from 'typeorm'
-import { Restaurant } from '../restaurants/restaurants.entity'
+import { Restaurant } from '../../restaurants/entities/restaurant.entity'
 
 @Entity('seats')
 export class Seat {
