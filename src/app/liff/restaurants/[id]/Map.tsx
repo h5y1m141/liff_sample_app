@@ -30,6 +30,9 @@ export const Map: FC = () => {
   const initialZoomLevel = 13
   const position: LatLngExpression = [latitude, longitude]
 
+  // NOTE
+  // 以下のようにdivのstyleで適切な幅などを設定しないと地図内のタイルが部分的にしか表示されない
+  // https://github.com/PaulLeCam/react-leaflet/issues/1052#issuecomment-1586217255
   return (
     <div
       style={{
