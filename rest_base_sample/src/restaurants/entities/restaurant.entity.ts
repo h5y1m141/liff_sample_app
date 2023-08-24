@@ -9,6 +9,24 @@ export class Restaurant {
   @Column({ type: 'varchar' })
   name: string
 
+  @Column({
+    type: 'decimal',
+    precision: 9,
+    scale: 6,
+    nullable: false,
+    default: 0.0,
+  })
+  latitude: number
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 6,
+    nullable: false,
+    default: 0.0,
+  })
+  longitude: number
+
   @Column({ type: 'timestamptz' })
   created_at
 
