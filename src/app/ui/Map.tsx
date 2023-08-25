@@ -1,6 +1,6 @@
 'use client'
 
-import { LatLngExpression } from 'leaflet'
+import L, { LatLngExpression } from 'leaflet'
 import { FC } from 'react'
 import {
   MapContainer,
@@ -9,24 +9,19 @@ import {
   Popup,
   ScaleControl,
   ZoomControl,
-  useMap,
 } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
-import './Map.css'
+import iconMarker from './marker-icon.png'
 
-const ComponentResize = () => {
-  const map = useMap()
+L.Icon.Default.mergeOptions({
+  iconUrl: iconMarker,
+})
 
-  setTimeout(() => {
-    map.invalidateSize()
-  }, 0)
-
-  return null
+type Props = {
+  latitude: number
+  longitude: number
 }
-
-export const Map: FC = () => {
-  const latitude = 35.658581
-  const longitude = 139.745433
+export const Map: FC<Props> = ({ latitude, longitude }) => {
   const initialZoomLevel = 13
   const position: LatLngExpression = [latitude, longitude]
 
@@ -48,7 +43,6 @@ export const Map: FC = () => {
         zoom={initialZoomLevel}
         center={position}
       >
-        <ComponentResize />
         <ScaleControl position='bottomright' imperial={false} />
         <ZoomControl position='bottomright' />
         <TileLayer

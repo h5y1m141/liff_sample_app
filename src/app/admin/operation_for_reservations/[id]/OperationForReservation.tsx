@@ -3,6 +3,7 @@
 import React, { FC, useRef, Suspense, useCallback } from 'react'
 import { useReactToPrint } from 'react-to-print'
 
+import { Map } from '../../../ui/Map'
 import { OperationForReservationType } from '../OperationForReservationList'
 import { useOperationForReservation } from './useOperationForReservation'
 
@@ -94,6 +95,10 @@ const Screen: FC<ScreenProps> = ({ operationForReservation, componentRef }) => {
                 <li>申請日：{operationForReservation.created_at}</li>
               </ul>
             </div>
+            <Map
+              latitude={operationForReservation.latitude}
+              longitude={operationForReservation.longitude}
+            />
           </>
         )}
       </Suspense>

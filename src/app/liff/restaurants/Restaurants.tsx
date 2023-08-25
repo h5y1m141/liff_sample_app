@@ -51,7 +51,6 @@ export const Restaurants: FC = () => {
                   <td>{restaurant.name}</td>
                   <td>{restaurant.phone}</td>
                   <td>
-                    {' '}
                     <button
                       type='button'
                       onClick={() =>
