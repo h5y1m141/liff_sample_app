@@ -28,6 +28,8 @@ export const useOperationForReservation = () => {
           const item: OperationForReservationType = {
             id: docSnapshot.id,
             created_at: docSnapshot.get('created_at').toDate().toLocaleString(),
+            latitude: docSnapshot.get('latitude'),
+            longitude: docSnapshot.get('longitude'),
           }
           setOperationForReservation(item)
         }

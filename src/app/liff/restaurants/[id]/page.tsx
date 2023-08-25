@@ -7,7 +7,7 @@ async function Page() {
   return (
     <>
       <Restaurant />
-      <Map />
+      <Map latitude={35.658581} longitude={139.745433} />
     </>
   )
 }

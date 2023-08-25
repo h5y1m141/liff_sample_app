@@ -9,7 +9,7 @@ import {
   orderBy,
   limit,
 } from 'firebase/firestore'
-
+import { useRouter } from 'next/navigation'
 import React, { useEffect, useState, FC, Suspense } from 'react'
 import { useAuthContext } from '@/src/app/context/auth'
 import { firebaseApp } from '@/src/app/firebase'
@@ -17,9 +17,12 @@ import { firebaseApp } from '@/src/app/firebase'
 export type OperationForReservationType = {
   id: string
   created_at: string
+  latitude: number
+  longitude: number
 }
 
 export const OperationForReservationList: FC = () => {
+  const router = useRouter()
   const authContext = useAuthContext()
   const [reservations, setReservations] =
     useState<OperationForReservationType[]>()
@@ -41,6 +44,8 @@ export const OperationForReservationList: FC = () => {
         querySnapshot.forEach((doc) => {
           items.push({
             id: doc.id,
+            latitude: doc.data().latitude,
+            longitude: doc.data().longitude,
             created_at: doc.data().created_at.toDate().toLocaleString(),
           })
         })
@@ -61,6 +66,7 @@ export const OperationForReservationList: FC = () => {
                 <tr>
                   <th>ID</th>
                   <th>申請日</th>
+                  <th>アクション</th>
                 </tr>
               </thead>
               <tbody>
@@ -69,6 +75,18 @@ export const OperationForReservationList: FC = () => {
                     <tr key={reservation.id}>
                       <td>{reservation.id}</td>
                       <td>{reservation.created_at}</td>
+                      <td>
+                        <button
+                          type='button'
+                          onClick={() =>
+                            router.push(
+                              `/admin/operation_for_reservations/${reservation.id}`,
+                            )
+                          }
+                        >
+                          予約詳細
+                        </button>
+                      </td>
                     </tr>
                   )
                 })}
