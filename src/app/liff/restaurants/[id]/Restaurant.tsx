@@ -14,6 +14,7 @@ import {
 
 import { useRouter, useParams } from 'next/navigation'
 import React, { FC, useState, useEffect, useCallback, Suspense } from 'react'
+import { Map } from '../../../ui/Map'
 import { useRestaurant } from './useRestaurant'
 import { useAuthContext } from '@/src/app/context/auth'
 import { firebaseApp } from '@/src/app/firebase'
@@ -128,54 +129,66 @@ const Screen: FC<ScreenProps> = ({ restaurant, handleReservation }) => {
       <h1>店舗詳細</h1>
       <Suspense fallback={<div>店舗情報を読み込んでます...</div>}>
         {restaurant && (
-          <div key={restaurant.id}>
-            <h2>店舗名：{restaurant.name}</h2>
-            <h3>詳細情報</h3>
-            <ul>
-              <li>電話番号：{restaurant.phone}</li>
-            </ul>
-            <table style={{ width: 800, border: 1 }}>
-              <thead>
-                <tr>
-                  <th>開始日時</th>
-                  <th>終了日時</th>
-                  <th>残席数</th>
-                  <th>予約</th>
-                </tr>
-              </thead>
-              <tbody>
-                {restaurant.bookableTables &&
-                  restaurant.bookableTables.length > 0 &&
-                  restaurant.bookableTables.map((bookableTable) => (
-                    <tr key={bookableTable.id}>
-                      <td>
-                        {dayjs(bookableTable.start_datetime.toDate()).format(
-                          'YYYY/MM/DD HH:mm:ss',
-                        )}
-                      </td>
-                      <td>
-                        {dayjs(bookableTable.end_datetime.toDate()).format(
-                          'YYYY/MM/DD HH:mm:ss',
-                        )}
-                      </td>
-                      <td>{bookableTable.available_reservation_requests}</td>
-                      <td>
-                        {bookableTable.available_reservation_requests !== 0 ? (
-                          <button
-                            onClick={() => {
-                              handleReservation(bookableTable.id)
-                            }}
-                          >
-                            この日時で予約申請する
-                          </button>
-                        ) : (
-                          '予約申請できません'
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+          <div key={restaurant.id} style={{ display: 'flex' }}>
+            <div style={{ width: 600, height: 300, padding: '4px' }}>
+              <h2>店舗名：{restaurant.name}</h2>
+              <h3>詳細情報</h3>
+
+              <Map
+                latitude={restaurant.latitude}
+                longitude={restaurant.longitude}
+                isCellLayerVisible={false}
+              />
+
+              <ul>
+                <li>電話番号：{restaurant.phone}</li>
+              </ul>
+            </div>
+            <div>
+              <table style={{ width: 600, border: 1 }}>
+                <thead>
+                  <tr>
+                    <th>開始日時</th>
+                    <th>終了日時</th>
+                    <th>残席数</th>
+                    <th>予約</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {restaurant.bookableTables &&
+                    restaurant.bookableTables.length > 0 &&
+                    restaurant.bookableTables.map((bookableTable) => (
+                      <tr key={bookableTable.id}>
+                        <td>
+                          {dayjs(bookableTable.start_datetime.toDate()).format(
+                            'YYYY/MM/DD HH:mm:ss',
+                          )}
+                        </td>
+                        <td>
+                          {dayjs(bookableTable.end_datetime.toDate()).format(
+                            'YYYY/MM/DD HH:mm:ss',
+                          )}
+                        </td>
+                        <td>{bookableTable.available_reservation_requests}</td>
+                        <td>
+                          {bookableTable.available_reservation_requests !==
+                          0 ? (
+                            <button
+                              onClick={() => {
+                                handleReservation(bookableTable.id)
+                              }}
+                            >
+                              予約申請
+                            </button>
+                          ) : (
+                            '-不可-'
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </Suspense>
