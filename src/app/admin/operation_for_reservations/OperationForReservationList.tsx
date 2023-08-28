@@ -9,6 +9,7 @@ import {
   orderBy,
   limit,
 } from 'firebase/firestore'
+import { latLngToCell } from 'h3-js'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState, FC, Suspense } from 'react'
 import { useAuthContext } from '@/src/app/context/auth'

@@ -21,6 +21,7 @@ type ContainerProps = {
 
 const Container: FC<ContainerProps> = ({ operationForReservation }) => {
   const componentRef = useRef<HTMLDivElement | null>(null)
+  const mapRef = useRef<HTMLDivElement | null>(null)
   const pageStyle = `
   @page { 
     size: auto;
@@ -52,6 +53,10 @@ const Container: FC<ContainerProps> = ({ operationForReservation }) => {
     removeAfterPrint: true, // 印刷後に印刷用のiframeを削除する
   })
 
+  const handleConfirmMap = () => {
+    console.info(mapRef.current)
+  }
+
   return (
     <>
       <div className='p-4'>
@@ -66,10 +71,21 @@ const Container: FC<ContainerProps> = ({ operationForReservation }) => {
               印刷
             </button>
           </div>
+          <div>
+            <button
+              onClick={handleConfirmMap}
+              className={
+                'w-full h-9 font-semibold rounded-medium border border-gray-darkest text-white bg-blue-500 hover:bg-indigo-700'
+              }
+            >
+              map
+            </button>
+          </div>
         </div>
         <Screen
           operationForReservation={operationForReservation}
           componentRef={componentRef}
+          mapRef={mapRef}
         />
       </div>
     </>
@@ -78,9 +94,14 @@ const Container: FC<ContainerProps> = ({ operationForReservation }) => {
 
 type ScreenProps = ContainerProps & {
   componentRef: React.MutableRefObject<HTMLDivElement | null>
+  mapRef: React.MutableRefObject<HTMLDivElement | null>
 }
 
-const Screen: FC<ScreenProps> = ({ operationForReservation, componentRef }) => {
+const Screen: FC<ScreenProps> = ({
+  operationForReservation,
+  componentRef,
+  mapRef,
+}) => {
   return (
     <>
       <Suspense fallback={<div>申請された予約情報を読み込んでます...</div>}>
@@ -95,10 +116,13 @@ const Screen: FC<ScreenProps> = ({ operationForReservation, componentRef }) => {
                 <li>申請日：{operationForReservation.created_at}</li>
               </ul>
             </div>
-            <Map
-              latitude={operationForReservation.latitude}
-              longitude={operationForReservation.longitude}
-            />
+            <div ref={mapRef}>
+              <Map
+                latitude={operationForReservation.latitude}
+                longitude={operationForReservation.longitude}
+                isCellLayerVisible={true}
+              />
+            </div>
           </>
         )}
       </Suspense>

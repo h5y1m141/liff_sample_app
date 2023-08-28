@@ -23,12 +23,15 @@ L.Icon.Default.mergeOptions({
 type Props = {
   latitude: number
   longitude: number
+  isCellLayerVisible: boolean
 }
+
+type CellLayerProps = Omit<Props, 'isCellLayerVisible'>
 
 const generateCoordinates = (start: number, count: number) =>
   Array.from({ length: count }, (_, i) => start + 0.01 * i)
 
-const CellLayer: FC<Props> = ({ latitude, longitude }) => {
+const CellLayer: FC<CellLayerProps> = ({ latitude, longitude }) => {
   const latitudes = generateCoordinates(latitude, 4)
   const longitudes = generateCoordinates(longitude, 4)
 
@@ -59,7 +62,7 @@ const CellLayer: FC<Props> = ({ latitude, longitude }) => {
   )
 }
 
-export const Map: FC<Props> = ({ latitude, longitude }) => {
+export const Map: FC<Props> = ({ latitude, longitude, isCellLayerVisible }) => {
   const initialZoomLevel = 13
   const position: LatLngExpression = [latitude, longitude]
 
@@ -82,7 +85,9 @@ export const Map: FC<Props> = ({ latitude, longitude }) => {
         zoom={initialZoomLevel}
         center={position}
       >
-        <CellLayer latitude={latitude} longitude={longitude} />
+        {isCellLayerVisible && (
+          <CellLayer latitude={latitude} longitude={longitude} />
+        )}
         <ScaleControl position='bottomright' imperial={false} />
         <ZoomControl position='bottomright' />
         <TileLayer
