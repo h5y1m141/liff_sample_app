@@ -2,7 +2,7 @@
 
 import { latLngToCell, cellToBoundary } from 'h3-js'
 import L, { LatLngExpression } from 'leaflet'
-import { FC, useState, useEffect } from 'react'
+import { FC } from 'react'
 import {
   MapContainer,
   TileLayer,
@@ -10,7 +10,6 @@ import {
   Popup,
   ScaleControl,
   ZoomControl,
-  useMap,
   Polygon,
 } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
