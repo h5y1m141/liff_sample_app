@@ -74,13 +74,13 @@ export const Map: FC<Props> = ({ latitude, longitude, isCellLayerVisible }) => {
       id='mapid'
       style={{
         maxWidth: '75vw',
-        height: 600,
+        height: 400,
       }}
     >
       <MapContainer
         style={{
-          height: '100%',
           width: '100%',
+          height: '100%',
         }}
         zoom={initialZoomLevel}
         center={position}
