@@ -1,6 +1,7 @@
 import * as admin from 'firebase-admin'
 import { FieldValue } from 'firebase-admin/firestore'
 import * as functions from 'firebase-functions'
+import { info, debug } from 'firebase-functions/logger'
 
 admin.initializeApp()
 
@@ -19,7 +20,7 @@ const hasAlreadyTriggered = (
       .doc(id)
     const doc = await transaction.get(ref)
     if (doc.exists) {
-      console.log(`EventID: ${id} has already triggered.`)
+      info(`EventID: ${id} has already triggered.`)
       return true
     } else {
       transaction.set(ref, {
@@ -33,14 +34,35 @@ const hasAlreadyTriggered = (
 export const copyReservationToOperation = functions.firestore
   .document('/users/{userId}/reservations/{reservationId}')
   .onCreate(async (snapshot, context) => {
-    if (hasAlreadyTriggered(context.eventId, 'copyReservationToOperation')) {
+    const { reservationId } = context.params
+    const check = await hasAlreadyTriggered(
+      context.eventId,
+      'copyReservationToOperation',
+    )
+    console.info('reservationId', reservationId)
+    console.info('dup check', check)
+
+    if (check) {
       return null
     }
 
-    const { reservationId } = context.params
     const reservationData = snapshot.data()
     const operationForReservationRef = admin
       .firestore()
       .doc(`/operation_for_reservations/${reservationId}`)
     await operationForReservationRef.set(reservationData)
+    await summarizeReservation()
   })
+
+const summarizeReservation = async () => {
+  const ref = admin.firestore().collection('/operation_for_reservations')
+  const snapshot = await ref.get()
+  const result = snapshot.docs.map((doc) => doc.data())
+
+  console.info('result', result)
+  const collectionRef = admin.firestore().collection('/reservation_summaries')
+  await collectionRef.add({
+    created_at: FieldValue.serverTimestamp(),
+    items: result,
+  })
+}
