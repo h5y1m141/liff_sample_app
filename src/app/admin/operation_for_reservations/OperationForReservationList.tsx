@@ -2,11 +2,15 @@
 
 import { useRouter } from 'next/navigation'
 import React, { FC, Suspense } from 'react'
+import { Map } from '../../ui/Map'
+import { useReservationSummaries } from './useReservationSummaries'
 import { useReservations } from './useReservations'
 
 export const OperationForReservationList: FC = () => {
   const router = useRouter()
   const { reservations } = useReservations()
+  const { summaries } = useReservationSummaries()
+  console.info('summaries', summaries)
 
   return (
     <>
@@ -46,6 +50,18 @@ export const OperationForReservationList: FC = () => {
               </tbody>
             </table>
           </>
+        )}
+      </Suspense>
+      <Suspense fallback={<div>店舗単位の予約サマリーを読み込んでます...</div>}>
+        {summaries && (
+          <div>
+            <Map
+              latitude={summaries ? summaries[0].latitude : 0}
+              longitude={summaries ? summaries[0].longitude : 0}
+              isCellLayerVisible={true}
+              summaries={summaries}
+            />
+          </div>
         )}
       </Suspense>
     </>

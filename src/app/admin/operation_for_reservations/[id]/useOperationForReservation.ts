@@ -1,7 +1,7 @@
 import { getDoc, doc, getFirestore } from 'firebase/firestore'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { OperationForReservationType } from '../OperationForReservationList'
+import { OperationForReservationType } from '../useReservations'
 import { firebaseApp } from '@/src/app/firebase'
 
 export const useOperationForReservation = () => {

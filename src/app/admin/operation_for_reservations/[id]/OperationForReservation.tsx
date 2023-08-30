@@ -4,7 +4,7 @@ import React, { FC, useRef, Suspense, useCallback } from 'react'
 import { useReactToPrint } from 'react-to-print'
 
 import { Map } from '../../../ui/Map'
-import { OperationForReservationType } from '../OperationForReservationList'
+import { OperationForReservationType } from '../useReservations'
 import { useOperationForReservation } from './useOperationForReservation'
 
 export const OperationForReservation: FC = () => {
