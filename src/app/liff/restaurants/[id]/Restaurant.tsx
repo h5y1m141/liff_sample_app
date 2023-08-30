@@ -91,8 +91,11 @@ const Container: FC<ContainerProps> = ({ user, restaurant, restaurantId }) => {
             if (!restaurant) throw 'Document does not exist!'
 
             await addDoc(colRef, {
-              restaurantId: restaurantRef.id,
-              restaurantName: restaurant.name,
+              user_id: user.uid,
+              user_name: user.displayName,
+              user_email: user.email,
+              restaurant_id: restaurantRef.id,
+              restaurant_name: restaurant.name,
               latitude: restaurant.latitude,
               longitude: restaurant.longitude,
               created_at: serverTimestamp(),
