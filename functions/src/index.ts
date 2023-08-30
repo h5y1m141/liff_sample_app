@@ -1,7 +1,11 @@
 import * as admin from 'firebase-admin'
-import { FieldValue } from 'firebase-admin/firestore'
+import { FieldValue, FirestoreDataConverter } from 'firebase-admin/firestore'
 import * as functions from 'firebase-functions'
-import { info, debug } from 'firebase-functions/logger'
+import { info } from 'firebase-functions/logger'
+import {
+  ReservationType,
+  reservationConverter,
+} from './models/ReservationModel'
 
 admin.initializeApp()
 
@@ -51,18 +55,49 @@ export const copyReservationToOperation = functions.firestore
       .firestore()
       .doc(`/operation_for_reservations/${reservationId}`)
     await operationForReservationRef.set(reservationData)
-    await summarizeReservation()
+    await summarizeReservation(reservationConverter)
   })
 
-const summarizeReservation = async () => {
-  const ref = admin.firestore().collection('/operation_for_reservations')
+const summarizeReservation = async (
+  reservationConverter: FirestoreDataConverter<ReservationType>,
+) => {
+  const ref = admin
+    .firestore()
+    .collection('/operation_for_reservations')
+    .withConverter(reservationConverter)
   const snapshot = await ref.get()
-  const result = snapshot.docs.map((doc) => doc.data())
+  const reservations = snapshot.docs.map((doc) => doc.data())
+  const summaries = generateSummaries(reservations)
 
-  console.info('result', result)
+  const hasUndefinedValues = reservations.some((reservation) =>
+    Object.values(reservation).some((value) => value === undefined),
+  )
   const collectionRef = admin.firestore().collection('/reservation_summaries')
-  await collectionRef.add({
-    created_at: FieldValue.serverTimestamp(),
-    items: result,
-  })
+  if (collectionRef && !hasUndefinedValues) {
+    await collectionRef.add({
+      created_at: FieldValue.serverTimestamp(),
+      items: reservations,
+      summaries,
+    })
+  }
+}
+
+export const generateSummaries = (reservations: ReservationType[]) => {
+  const summaries = Object.values(
+    reservations.reduce((acc, cur) => {
+      const key = `${cur.restaurant_id}-${cur.created_at}`
+      if (!acc[key]) {
+        acc[key] = {
+          restaurant_id: cur.restaurant_id,
+          reserved_at: cur.created_at,
+          count: 0,
+          latitude: cur.latitude,
+          longitude: cur.longitude,
+        }
+      }
+      acc[key].count++
+      return acc
+    }, {}),
+  )
+  return summaries
 }
