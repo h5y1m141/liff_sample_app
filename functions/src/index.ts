@@ -1,6 +1,11 @@
 import * as admin from 'firebase-admin'
-import { FieldValue } from 'firebase-admin/firestore'
+import { FieldValue, FirestoreDataConverter } from 'firebase-admin/firestore'
 import * as functions from 'firebase-functions'
+import { info } from 'firebase-functions/logger'
+import {
+  ReservationType,
+  reservationConverter,
+} from './models/ReservationModel'
 
 admin.initializeApp()
 
@@ -19,7 +24,7 @@ const hasAlreadyTriggered = (
       .doc(id)
     const doc = await transaction.get(ref)
     if (doc.exists) {
-      console.log(`EventID: ${id} has already triggered.`)
+      info(`EventID: ${id} has already triggered.`)
       return true
     } else {
       transaction.set(ref, {
@@ -33,14 +38,66 @@ const hasAlreadyTriggered = (
 export const copyReservationToOperation = functions.firestore
   .document('/users/{userId}/reservations/{reservationId}')
   .onCreate(async (snapshot, context) => {
-    if (hasAlreadyTriggered(context.eventId, 'copyReservationToOperation')) {
+    const { reservationId } = context.params
+    const check = await hasAlreadyTriggered(
+      context.eventId,
+      'copyReservationToOperation',
+    )
+    console.info('reservationId', reservationId)
+    console.info('dup check', check)
+
+    if (check) {
       return null
     }
 
-    const { reservationId } = context.params
     const reservationData = snapshot.data()
     const operationForReservationRef = admin
       .firestore()
       .doc(`/operation_for_reservations/${reservationId}`)
     await operationForReservationRef.set(reservationData)
+    await summarizeReservation(reservationConverter)
   })
+
+const summarizeReservation = async (
+  reservationConverter: FirestoreDataConverter<ReservationType>,
+) => {
+  const ref = admin
+    .firestore()
+    .collection('/operation_for_reservations')
+    .withConverter(reservationConverter)
+  const snapshot = await ref.get()
+  const reservations = snapshot.docs.map((doc) => doc.data())
+  const summaries = generateSummaries(reservations)
+
+  const hasUndefinedValues = reservations.some((reservation) =>
+    Object.values(reservation).some((value) => value === undefined),
+  )
+  const collectionRef = admin.firestore().collection('/reservation_summaries')
+  if (collectionRef && !hasUndefinedValues) {
+    await collectionRef.add({
+      created_at: FieldValue.serverTimestamp(),
+      items: reservations,
+      summaries,
+    })
+  }
+}
+
+export const generateSummaries = (reservations: ReservationType[]) => {
+  const summaries = Object.values(
+    reservations.reduce((acc, cur) => {
+      const key = `${cur.restaurant_id}-${cur.created_at}`
+      if (!acc[key]) {
+        acc[key] = {
+          restaurant_id: cur.restaurant_id,
+          reserved_at: cur.created_at,
+          count: 0,
+          latitude: cur.latitude,
+          longitude: cur.longitude,
+        }
+      }
+      acc[key].count++
+      return acc
+    }, {}),
+  )
+  return summaries
+}

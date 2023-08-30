@@ -19,10 +19,18 @@ L.Icon.Default.mergeOptions({
   iconUrl: iconMarker,
 })
 
+type SummaryType = {
+  restaurant_id: string
+  count: number
+  latitude: number
+  longitude: number
+  reserved_at: any
+}
 type Props = {
   latitude: number
   longitude: number
   isCellLayerVisible: boolean
+  summaries?: SummaryType[]
 }
 
 type CellLayerProps = Omit<Props, 'isCellLayerVisible'>
@@ -30,39 +38,54 @@ type CellLayerProps = Omit<Props, 'isCellLayerVisible'>
 const generateCoordinates = (start: number, count: number) =>
   Array.from({ length: count }, (_, i) => start + 0.01 * i)
 
-const CellLayer: FC<CellLayerProps> = ({ latitude, longitude }) => {
+const CellLayer: FC<CellLayerProps> = ({ latitude, longitude, summaries }) => {
   const latitudes = generateCoordinates(latitude, 4)
   const longitudes = generateCoordinates(longitude, 4)
 
   const sampleLatLngs = latitudes.flatMap((lat) =>
     longitudes.map((lng) => [lat, lng]),
   )
-
-  const hexBoundaries = sampleLatLngs.map(([lat, lng]) => {
-    const h3Index = latLngToCell(lat, lng, 8)
+  const latLngs = summaries?.map((summary) => {
+    return [summary.latitude, summary.longitude]
+  })
+  console.info('sampleLatLngs', sampleLatLngs)
+  console.info('latLngs', latLngs)
+  const hexBoundaries = latLngs?.map(([lat, lng]) => {
+    const h3Index = latLngToCell(lat, lng, 9)
     return cellToBoundary(h3Index)
   })
-  console.info(hexBoundaries)
+  console.info('hexBoundaries', hexBoundaries)
+  // const hexBoundaries = sampleLatLngs.map(([lat, lng]) => {
+  //   const h3Index = latLngToCell(lat, lng, 8)
+  //   return cellToBoundary(h3Index)
+  // })
 
   return (
     <>
-      {hexBoundaries.map((hexBoundary) => {
-        return (
-          <>
-            <Polygon
-              positions={hexBoundary.map((coord) => [coord[0], coord[1]])}
-              fillColor='red'
-              fillOpacity={0.5}
-            />
-          </>
-        )
-      })}
+      {hexBoundaries &&
+        hexBoundaries.map((hexBoundary, index) => {
+          return (
+            <>
+              <Polygon
+                key={index}
+                positions={hexBoundary.map((coord) => [coord[0], coord[1]])}
+                fillColor='red'
+                fillOpacity={0.5}
+              />
+            </>
+          )
+        })}
     </>
   )
 }
 
-export const Map: FC<Props> = ({ latitude, longitude, isCellLayerVisible }) => {
-  const initialZoomLevel = 13
+export const Map: FC<Props> = ({
+  latitude,
+  longitude,
+  isCellLayerVisible,
+  summaries,
+}) => {
+  const initialZoomLevel = 14
   const position: LatLngExpression = [latitude, longitude]
 
   // NOTE
@@ -85,7 +108,11 @@ export const Map: FC<Props> = ({ latitude, longitude, isCellLayerVisible }) => {
         center={position}
       >
         {isCellLayerVisible && (
-          <CellLayer latitude={latitude} longitude={longitude} />
+          <CellLayer
+            latitude={latitude}
+            longitude={longitude}
+            summaries={summaries}
+          />
         )}
         <ScaleControl position='bottomright' imperial={false} />
         <ZoomControl position='bottomright' />
