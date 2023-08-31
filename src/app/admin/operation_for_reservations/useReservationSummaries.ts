@@ -1,14 +1,10 @@
 import { getDoc, doc, getFirestore } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 import { firebaseApp } from '@/src/app/firebase'
-
-export type SummaryType = {
-  restaurant_id: string
-  count: number
-  latitude: number
-  longitude: number
-  reserved_at: any
-}
+import {
+  ReservationSummaryConverter,
+  SummaryType,
+} from '@/src/app/models/ReservationSummaryModel'
 
 export const useReservationSummaries = () => {
   const [summaries, setSummaries] = useState<SummaryType[]>()
@@ -18,7 +14,9 @@ export const useReservationSummaries = () => {
       const docId = 'gkmPjFIO88DqGMrWoUB5'
 
       const db = getFirestore(firebaseApp)
-      const docRef = doc(db, collectionName, docId)
+      const docRef = doc(db, collectionName, docId).withConverter(
+        ReservationSummaryConverter,
+      )
       const docSnapshot = await getDoc(docRef)
 
       if (docSnapshot.exists()) {
