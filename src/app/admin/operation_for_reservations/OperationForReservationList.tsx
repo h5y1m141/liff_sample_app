@@ -10,7 +10,6 @@ export const OperationForReservationList: FC = () => {
   const router = useRouter()
   const { reservations } = useReservations()
   const { summaries } = useReservationSummaries()
-  console.info('summaries', summaries)
 
   return (
     <>
