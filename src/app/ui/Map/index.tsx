@@ -2,6 +2,11 @@
 
 import { latLngToCell, cellToBoundary } from 'h3-js'
 import L, { LatLngExpression } from 'leaflet'
+
+import 'leaflet/dist/leaflet.css'
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
+import markerIcon from 'leaflet/dist/images/marker-icon.png'
+import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 import { FC, Fragment } from 'react'
 import {
   MapContainer,
@@ -12,12 +17,12 @@ import {
   ZoomControl,
   Polygon,
 } from 'react-leaflet'
-import 'leaflet/dist/leaflet.css'
-import iconMarker from './marker-icon.png'
 import { SummaryType } from '@/src/app/models/ReservationSummaryModel'
 
 L.Icon.Default.mergeOptions({
-  iconUrl: iconMarker,
+  iconUrl: markerIcon.src,
+  iconRetinaUrl: markerIcon2x.src,
+  shadowUrl: markerShadow.src,
 })
 
 type Props = {
