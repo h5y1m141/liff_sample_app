@@ -11,7 +11,6 @@ import { RestaurantsModule } from './restaurants/restaurants.module'
 import { SeatsModule } from './seats/seats.module'
 import { ConfigModule } from '@nestjs/config'
 import { AuthMiddleware } from './middlewares/AuthMiddleware'
-import { CorsMiddleware } from './middlewares/CorsMiddleware'
 import { ReservationsModule } from './reservations/reservations.module'
 import { TypeOrmConfigService } from './orm.config'
 
