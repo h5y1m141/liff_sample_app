@@ -1,6 +1,6 @@
+import Link from 'next/link'
 import React from 'react'
 import { Result } from 'result-type-ts'
-import { RestaurantList } from './RestaurantList'
 
 async function fetchRestaurants() {
   const backendBaseURL = process.env.NEXT_PUBLIC_BACKEND_URL
@@ -18,22 +18,6 @@ async function fetchRestaurants() {
   return result.value
 }
 
-// "id": 1,
-// "name": "すし黒崎",
-// "latitude": "0.000000",
-// "longitude": "0.000000",
-// "created_at": "2023-08-22T06:12:13.610Z",
-// "updated_at": "2023-08-22T06:12:13.610Z",
-// "seats": [
-//   {
-//     "id": 3,
-//     "restaurant_id": 1,
-//     "number_of_seats": 4,
-//     "start_at": "2023-09-05T07:00:00.000Z",
-//     "end_at": "2023-09-05T08:00:00.000Z",
-//     "created_at": "2023-09-04T06:40:31.030Z",
-//     "updated_at": "2023-09-04T06:40:31.030Z"
-//   },
 type SeatType = {
   restaurant_id: number
   number_of_seats: number
@@ -72,7 +56,9 @@ async function Page() {
                 <td>{restaurant.id}</td>
                 <td>{restaurant.name}</td>
                 <td>
-                  <button type='button'>レストラン詳細</button>
+                  <Link href={`/web/restaurants/${restaurant.id}`}>
+                    レストラン詳細
+                  </Link>
                 </td>
               </tr>
             )
