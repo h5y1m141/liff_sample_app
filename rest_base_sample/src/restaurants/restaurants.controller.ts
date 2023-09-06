@@ -12,7 +12,6 @@ export class RestaurantsController {
   constructor(private readonly restaurantsService: RestaurantsService) {}
 
   @Get()
-  @Render('restaurants/index')
   async findAll(): Promise<{ restaurants: Restaurant[] }> {
     const restaurants = await this.restaurantsService.findAll()
     return { restaurants }
