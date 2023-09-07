@@ -13,6 +13,7 @@ import { ConfigModule } from '@nestjs/config'
 import { AuthMiddleware } from './middlewares/AuthMiddleware'
 import { ReservationsModule } from './reservations/reservations.module'
 import { TypeOrmConfigService } from './orm.config'
+import { PaymentIntentsModule } from './payment_intents/payment_intents.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { TypeOrmConfigService } from './orm.config'
     RestaurantsModule,
     SeatsModule,
     ReservationsModule,
+    PaymentIntentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
