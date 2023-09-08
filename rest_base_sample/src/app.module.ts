@@ -14,6 +14,7 @@ import { AuthMiddleware } from './middlewares/AuthMiddleware'
 import { ReservationsModule } from './reservations/reservations.module'
 import { TypeOrmConfigService } from './orm.config'
 import { PaymentIntentsModule } from './payment_intents/payment_intents.module';
+import { RestaurantCoursesModule } from './restaurant_courses/restaurant_courses.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { PaymentIntentsModule } from './payment_intents/payment_intents.module';
     SeatsModule,
     ReservationsModule,
     PaymentIntentsModule,
+    RestaurantCoursesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

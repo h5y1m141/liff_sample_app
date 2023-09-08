@@ -1,9 +1,6 @@
 import 'dotenv/config'
 import { DataSource } from 'typeorm'
 
-import { Restaurant } from '../restaurants/entities/restaurant.entity'
-import { Seat } from '../seats/entities/seat.entity'
-import { Reservation } from '../reservations/entities/reservation.entity'
 export default new DataSource({
   type: 'postgres',
   host: process.env.DATABASE_HOST,

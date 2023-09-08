@@ -1,4 +1,5 @@
 import { Seat } from '../../seats/entities/seat.entity'
+import { RestaurantCourse } from '../../restaurant_courses/entities/restaurant_course.entity'
 import { OneToMany, Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('restaurants')
@@ -35,4 +36,10 @@ export class Restaurant {
 
   @OneToMany(() => Seat, (seat) => seat.restaurant)
   seats: Seat[]
+
+  @OneToMany(
+    () => RestaurantCourse,
+    (restaurantCourse) => restaurantCourse.restaurant,
+  )
+  restaurant_courses: RestaurantCourse[]
 }
