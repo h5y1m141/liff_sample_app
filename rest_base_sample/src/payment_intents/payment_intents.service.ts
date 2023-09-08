@@ -12,7 +12,7 @@ export class PaymentIntentsService {
 
     const paymentIntent: Stripe.PaymentIntent =
       await stripe.paymentIntents.create({
-        amount: 50, // 最低限の金額である50円を仮設定
+        amount: createPaymentIntentDto.price,
         currency: 'jpy',
       })
 
