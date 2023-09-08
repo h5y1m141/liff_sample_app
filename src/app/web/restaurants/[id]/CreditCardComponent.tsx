@@ -47,14 +47,23 @@ export const CreditCardComponent: FC<Props> = () => {
   return (
     <>
       <form id='payment-form' onSubmit={handleOnSubmit}>
-        <LinkAuthenticationElement id='link-authentication-element' />
         <PaymentElement />
-        <button disabled={isLoading || !stripe || !elements} id='submit'>
+        <button
+          style={{
+            marginTop: 10,
+            backgroundColor: 'gray',
+            padding: 10,
+            color: 'white',
+            borderRadius: 5,
+          }}
+          disabled={isLoading || !stripe || !elements}
+          id='submit'
+        >
           <span id='button-text'>
             {isLoading ? (
               <div className='spinner' id='spinner'></div>
             ) : (
-              'Pay now'
+              'この内容で申請'
             )}
           </span>
         </button>

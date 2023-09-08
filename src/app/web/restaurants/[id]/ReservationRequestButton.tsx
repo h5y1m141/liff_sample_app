@@ -38,7 +38,7 @@ export const ReservationRequestButton: FC<Props> = ({ id }) => {
         fetchOption(requestBody, token),
       )
       const result = res.ok
-        ? Result.success(res.json())
+        ? Result.success(await res.json())
         : Result.failure(res.statusText)
       console.info(result)
     },
