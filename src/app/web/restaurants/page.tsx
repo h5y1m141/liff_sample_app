@@ -12,7 +12,7 @@ async function fetchRestaurants() {
   }
   const res = await fetch(`${backendBaseURL}/restaurants`, options)
   const result = res.ok
-    ? Result.success(res.json())
+    ? Result.success(await res.json())
     : Result.failure(res.statusText)
 
   return result.value

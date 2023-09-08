@@ -15,6 +15,9 @@ export class Reservation {
   @Column({ type: 'int4' })
   seat_id
 
+  @Column({ type: 'int4' })
+  restaurant_course_id
+
   @Column({ type: 'timestamptz' })
   created_at
 

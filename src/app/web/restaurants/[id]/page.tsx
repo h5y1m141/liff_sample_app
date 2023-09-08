@@ -1,8 +1,6 @@
-import dayjs from 'dayjs'
-
 import React from 'react'
 import { Result } from 'result-type-ts'
-import { ReservationRequestButton } from './ReservationRequestButton'
+import { ReservationRequest } from './ReservationRequest'
 
 async function fetchRestaurant(id: string) {
   const backendBaseURL = process.env.NEXT_PUBLIC_BACKEND_URL
@@ -14,7 +12,7 @@ async function fetchRestaurant(id: string) {
   }
   const res = await fetch(`${backendBaseURL}/restaurants/${id}`, options)
   const result = res.ok
-    ? Result.success(res.json())
+    ? Result.success(await res.json())
     : Result.failure(res.statusText)
 
   return result.value
@@ -27,12 +25,20 @@ export type SeatType = {
   start_at: string
 }
 
+export type RestaurantCourseType = {
+  id: number
+  restaurant_id: number
+  name: string
+  price: number
+}
+
 type ResponseType = {
   id: number
   name: string
   latitude: string
   longitude: string
   seats: SeatType[]
+  restaurant_courses: RestaurantCourseType[]
 }
 
 type ParamsType = {
@@ -43,38 +49,14 @@ async function Page(props: { params: ParamsType }) {
   const restaurant: ResponseType = await fetchRestaurant(id)
 
   return (
-    <>
-      <h1>{restaurant.name}の予約可能な席の情報</h1>
+    <div style={{ padding: 10 }}>
+      <h1 style={{ fontSize: '1.5rem' }}>{restaurant.name}の予約申請を行う</h1>
 
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>予約可能な席数</th>
-            <th>開始時間</th>
-            <th>予約</th>
-          </tr>
-        </thead>
-        <tbody>
-          {restaurant.seats.map((seat) => {
-            return (
-              <tr key={seat.id}>
-                <td>{seat.id}</td>
-                <td>{seat.number_of_seats}</td>
-                <td>{dayjs(seat.start_at).format('YYYY/MM/DD HH:mm:ss')}</td>
-                <td>
-                  {seat.number_of_seats === 0 ? (
-                    '--満席--'
-                  ) : (
-                    <ReservationRequestButton id={seat.id} />
-                  )}
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-    </>
+      <ReservationRequest
+        seats={restaurant.seats.filter((seat) => seat.number_of_seats > 0)}
+        restaurantCourses={restaurant.restaurant_courses}
+      />
+    </div>
   )
 }
 

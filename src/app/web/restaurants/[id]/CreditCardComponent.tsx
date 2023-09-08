@@ -1,17 +1,14 @@
 'use client'
 
-import {
-  PaymentElement,
-  LinkAuthenticationElement,
-  useStripe,
-  useElements,
-} from '@stripe/react-stripe-js'
+import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 
 import React, { FC, useCallback, useState } from 'react'
 
-type Props = {}
+type Props = {
+  handleReservation: () => void
+}
 
-export const CreditCardComponent: FC<Props> = () => {
+export const CreditCardComponent: FC<Props> = ({ handleReservation }) => {
   const stripe = useStripe()
   const elements = useElements()
   const [isLoading, setIsLoading] = useState(false)
@@ -31,6 +28,7 @@ export const CreditCardComponent: FC<Props> = () => {
           return_url: `${window.location.origin}/web/restaurants`,
         },
       })
+      if (!error) await handleReservation()
 
       if (error.type === 'card_error' || error.type === 'validation_error') {
         const errorMessage = error.message
@@ -41,20 +39,29 @@ export const CreditCardComponent: FC<Props> = () => {
 
       setIsLoading(false)
     },
-    [stripe, elements],
+    [stripe, elements, handleReservation],
   )
 
   return (
     <>
       <form id='payment-form' onSubmit={handleOnSubmit}>
-        <LinkAuthenticationElement id='link-authentication-element' />
         <PaymentElement />
-        <button disabled={isLoading || !stripe || !elements} id='submit'>
+        <button
+          style={{
+            marginTop: 10,
+            backgroundColor: 'gray',
+            padding: 10,
+            color: 'white',
+            borderRadius: 5,
+          }}
+          disabled={isLoading || !stripe || !elements}
+          id='submit'
+        >
           <span id='button-text'>
             {isLoading ? (
               <div className='spinner' id='spinner'></div>
             ) : (
-              'Pay now'
+              'この内容で申請'
             )}
           </span>
         </button>
