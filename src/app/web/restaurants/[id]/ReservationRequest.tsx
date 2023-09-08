@@ -16,28 +16,15 @@ type Props = {
 
 const backendBaseURL = process.env.NEXT_PUBLIC_BACKEND_URL
 
-const fetchOption = (data: any, token: string) => {
-  return {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      mode: 'cors',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(data),
-  }
-}
-
 export const ReservationRequest: FC<Props> = ({ seats, restaurantCourses }) => {
   const [stripePromise, setStripePromise] = useState<Stripe | null>(null)
   const [stripeSecretKey, setStripeSecretKey] = useState<string | null>(null)
   const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 
-  const [selectedSeat, setSelectedSeat] = useState<SeatType | null>()
+  const [selectedSeat, setSelectedSeat] = useState<SeatType>()
   const [selectedRestaurantCourse, setSelectedRestaurantCourse] =
-    useState<RestaurantCourseType | null>()
+    useState<RestaurantCourseType>()
   const [requestComment, setRequestComment] = useState('')
-  const [isReservationRequest, setIsReservationRequest] = useState(false)
   const [token, setToken] = useState<string>()
   const authContext = useAuthContext()
 
@@ -63,11 +50,16 @@ export const ReservationRequest: FC<Props> = ({ seats, restaurantCourses }) => {
 
   useEffect(() => {
     ;(async () => {
-      if (authContext.token && selectedRestaurantCourse?.price) {
-        const token = authContext.token
+      if (token && selectedSeat && selectedRestaurantCourse?.price) {
+        const params = {
+          price: selectedRestaurantCourse?.price,
+          seat_id: selectedSeat.id,
+          restaurant_course_id: selectedRestaurantCourse.id,
+          requestComment,
+        }
         const res = await fetch(
           `${backendBaseURL}/payment_intents`,
-          fetchOption({ price: selectedRestaurantCourse?.price }, token),
+          fetchOption(params, token),
         )
         const data = await res.json()
 
@@ -76,7 +68,22 @@ export const ReservationRequest: FC<Props> = ({ seats, restaurantCourses }) => {
         }
       }
     })()
-  }, [authContext, selectedRestaurantCourse])
+  }, [token, selectedSeat, selectedRestaurantCourse, requestComment])
+
+  const handleReservation = useCallback(async () => {
+    if (!token || !selectedSeat || !selectedRestaurantCourse) return
+
+    const params = {
+      seat_id: selectedSeat.id,
+      restaurant_course_id: selectedRestaurantCourse.id,
+      requestComment,
+    }
+    const res = await fetch(
+      `${backendBaseURL}/reservations`,
+      fetchOption({ params }, token),
+    )
+    console.info('res', res)
+  }, [selectedSeat, selectedRestaurantCourse, requestComment, token])
 
   const handleSelectSeat = useCallback(
     (event: { target: { value: string } }) => {
@@ -110,8 +117,6 @@ export const ReservationRequest: FC<Props> = ({ seats, restaurantCourses }) => {
       if (authContext.token) setToken(authContext.token)
     })()
   }, [authContext.token])
-
-  if (isReservationRequest) return <div>予約申請中...</div>
 
   return (
     <>
@@ -175,11 +180,7 @@ export const ReservationRequest: FC<Props> = ({ seats, restaurantCourses }) => {
             stripe={stripePromise}
             options={{ clientSecret: stripeSecretKey }}
           >
-            <CreditCardComponent
-              selectedSeat={selectedSeat}
-              selectedRestaurantCourse={selectedRestaurantCourse}
-              requestComment={requestComment}
-            />
+            <CreditCardComponent handleReservation={handleReservation} />
           </Elements>
         </>
       ) : (

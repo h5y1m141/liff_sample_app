@@ -1,17 +1,14 @@
 'use client'
 
-import {
-  PaymentElement,
-  LinkAuthenticationElement,
-  useStripe,
-  useElements,
-} from '@stripe/react-stripe-js'
+import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 
 import React, { FC, useCallback, useState } from 'react'
 
-type Props = {}
+type Props = {
+  handleReservation: () => void
+}
 
-export const CreditCardComponent: FC<Props> = () => {
+export const CreditCardComponent: FC<Props> = ({ handleReservation }) => {
   const stripe = useStripe()
   const elements = useElements()
   const [isLoading, setIsLoading] = useState(false)
@@ -31,6 +28,7 @@ export const CreditCardComponent: FC<Props> = () => {
           return_url: `${window.location.origin}/web/restaurants`,
         },
       })
+      if (!error) await handleReservation()
 
       if (error.type === 'card_error' || error.type === 'validation_error') {
         const errorMessage = error.message
@@ -41,7 +39,7 @@ export const CreditCardComponent: FC<Props> = () => {
 
       setIsLoading(false)
     },
-    [stripe, elements],
+    [stripe, elements, handleReservation],
   )
 
   return (
