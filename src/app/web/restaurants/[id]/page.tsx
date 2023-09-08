@@ -1,9 +1,6 @@
-import dayjs from 'dayjs'
-
 import React from 'react'
 import { Result } from 'result-type-ts'
 import { ReservationRequest } from './ReservationRequest'
-import { ReservationRequestButton } from './ReservationRequestButton'
 
 async function fetchRestaurant(id: string) {
   const backendBaseURL = process.env.NEXT_PUBLIC_BACKEND_URL
