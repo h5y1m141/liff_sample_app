@@ -4,11 +4,12 @@ import { Result } from 'result-type-ts'
 
 async function fetchRestaurants() {
   const backendBaseURL = process.env.NEXT_PUBLIC_BACKEND_URL
-  const options = {
+  const options: RequestInit = {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
+    cache: 'no-store' as RequestCache,
   }
   const res = await fetch(`${backendBaseURL}/restaurants`, options)
   const result = res.ok
