@@ -13,6 +13,6 @@ async function bootstrap() {
   app.setViewEngine('hbs')
   app.useGlobalPipes(new ValidationPipe())
 
-  await app.listen(4000)
+  await app.listen(process.env.PORT || 4000)
 }
 bootstrap()
