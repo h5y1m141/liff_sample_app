@@ -15,6 +15,7 @@ import { ReservationsModule } from './reservations/reservations.module'
 import { TypeOrmConfigService } from './orm.config'
 import { PaymentIntentsModule } from './payment_intents/payment_intents.module'
 import { RestaurantCoursesModule } from './restaurant_courses/restaurant_courses.module'
+import { HealthchecksModule } from './healthchecks/healthchecks.module'
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { RestaurantCoursesModule } from './restaurant_courses/restaurant_courses
     ReservationsModule,
     PaymentIntentsModule,
     RestaurantCoursesModule,
+    HealthchecksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -38,6 +40,7 @@ export class AppModule implements NestModule {
     consumer
       .apply(AuthMiddleware)
       .exclude(
+        { path: 'health', method: RequestMethod.GET },
         { path: 'restaurants', method: RequestMethod.GET },
         { path: 'restaurants/:id', method: RequestMethod.GET },
       )
