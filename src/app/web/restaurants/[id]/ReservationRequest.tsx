@@ -122,10 +122,10 @@ export const ReservationRequest: FC<Props> = ({ seats, restaurantCourses }) => {
     <>
       <h2 style={{ fontSize: '1.2rem' }}>コースを選択</h2>
       <select
-        name='seat'
-        id='select-seat'
+        name='course'
+        id='select-course'
         style={selectStyle}
-        onBlur={handleSelectSeat}
+        onBlur={handleSelectRestaurantCourse}
       >
         <option value=''>選択してください</option>
         {restaurantCourses.map((course) => {
@@ -146,7 +146,7 @@ export const ReservationRequest: FC<Props> = ({ seats, restaurantCourses }) => {
           name='seat'
           id='select-seat'
           style={selectStyle}
-          onBlur={handleSelectRestaurantCourse}
+          onBlur={handleSelectSeat}
         >
           <option value=''>選択してください</option>
           {seats.map((seat) => {
@@ -170,7 +170,6 @@ export const ReservationRequest: FC<Props> = ({ seats, restaurantCourses }) => {
           onChange={handleComment}
         />
       </div>
-
       {selectedSeat &&
       selectedRestaurantCourse &&
       stripeSecretKey &&
