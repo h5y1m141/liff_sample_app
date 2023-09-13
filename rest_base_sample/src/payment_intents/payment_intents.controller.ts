@@ -19,27 +19,4 @@ export class PaymentIntentsController {
   create(@Body() createPaymentIntentDto: CreatePaymentIntentDto) {
     return this.paymentIntentsService.create(createPaymentIntentDto)
   }
-
-  @Get()
-  findAll() {
-    return this.paymentIntentsService.findAll()
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paymentIntentsService.findOne(+id)
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updatePaymentIntentDto: UpdatePaymentIntentDto,
-  ) {
-    return this.paymentIntentsService.update(+id, updatePaymentIntentDto)
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.paymentIntentsService.remove(+id)
-  }
 }
