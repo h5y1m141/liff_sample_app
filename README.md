@@ -76,3 +76,7 @@ firebase emulators:start
 ## production
 
 本番環境のブランチがあるのでそちらを利用する
+
+## NestJS ベースのアプリ
+
+rest_base_sample ディレクトリ配下は NestJS ベースのアプリが格納してあります
