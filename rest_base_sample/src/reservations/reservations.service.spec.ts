@@ -4,7 +4,7 @@ import { Reservation } from './entities/reservation.entity'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { DataSource } from 'typeorm'
 
-const mockReservationRepository = () => ({
+export const mockReservationRepository = () => ({
   find: jest.fn(),
   findOne: jest.fn(),
 })
@@ -87,6 +87,7 @@ describe('ReservationsService', () => {
       expect(await service.findOne(result.id)).toEqual(result)
     })
   })
+
   describe('create', () => {
     it('should handle seat reservation and return the result', async () => {
       const dto = { seat_id: 1, restaurant_course_id: 1 }
