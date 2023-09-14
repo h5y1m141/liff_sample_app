@@ -1,11 +1,17 @@
 'use client'
 import type { User } from 'firebase/auth'
-import { onAuthStateChanged, getAuth } from 'firebase/auth'
+import {
+  OAuthProvider,
+  onAuthStateChanged,
+  getAuth,
+  signInWithRedirect,
+} from 'firebase/auth'
 import {
   createContext,
   useState,
   useContext,
   useEffect,
+  useCallback,
   ReactNode,
 } from 'react'
 import { firebaseApp } from '@/src/app/firebase'
@@ -17,6 +23,7 @@ export type AuthContextProps = {
 export type AuthProps = {
   children: ReactNode
 }
+const provider = new OAuthProvider('oidc.restaurants')
 const AuthComponentContext = createContext<Partial<AuthContextProps>>({})
 
 export const useAuthContext = () => {
@@ -47,8 +54,18 @@ export const AuthComponent = ({ children }: AuthProps) => {
     }
   }, [auth])
 
+  const handleSignIn = useCallback(() => {
+    signInWithRedirect(auth, provider)
+  }, [])
+
   if (isChecking) return <div>Loading....</div>
-  if (!user) return <div>LINEログインが完了していません</div>
+  if (!user)
+    return (
+      <>
+        <div>LINEログインが完了していません</div>{' '}
+        <button onClick={() => handleSignIn()}>LINEログイン</button>
+      </>
+    )
 
   return (
     <AuthComponentContext.Provider value={value}>
