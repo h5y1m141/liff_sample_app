@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>店舗一覧</title>
+  </head>
+  <body>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>店舗名</th>
+          <th>作成日時</th>
+          <th>空席</th>
+        </tr>
+      </thead>
+      {{#each restaurants}}
+        <tr>
+          <td>{{id}}</td>
+          <td>{{name}}</td>
+          <td>{{created_at}}</td>
+          <td>
+            <ul>
+            {{#each seats}}
+              <li>{{number_of_seats}}</li>
+            {{/each}}
+            </ul>
+          </td>
+        </tr>
+      {{/each}}
+    {{ message }}
+    </table>
+  </body>
+</html>

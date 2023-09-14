@@ -11,7 +11,7 @@ async function Page() {
       <h3>管理機能</h3>
       <ul>
         <li>
-          <a href='/operation_for_reservations'>予約確認</a>
+          <a href='/admin/operation_for_reservations'>予約確認</a>
         </li>
       </ul>
     </>

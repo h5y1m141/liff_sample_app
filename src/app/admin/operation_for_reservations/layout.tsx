@@ -5,7 +5,6 @@ export default function RestaurantsLayout({
 }) {
   return (
     <>
-      <h1>予約一覧</h1>
       <section>{children}</section>
     </>
   )

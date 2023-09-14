@@ -26,6 +26,8 @@ const prepareParams = () => {
       duration: { type: 'integer', minimum: 1 },
       available_reservation_requests: { type: 'integer', minimum: 1 },
       restaurant_name: { type: 'string' },
+      latitude: { type: 'number' },
+      longitude: { type: 'number' },
     },
     required: [
       'start_datetime',
@@ -33,6 +35,8 @@ const prepareParams = () => {
       'duration',
       'available_reservation_requests',
       'restaurant_name',
+      'latitude',
+      'longitude',
     ],
     additionalProperties: false,
   }
@@ -55,9 +59,13 @@ const prepareParams = () => {
     args.available_reservation_requests,
   )
   const restaurantName = args.restaurant_name
+  const latitude = args.latitude
+  const longitude = args.longitude
 
   return {
     restaurantName,
+    latitude,
+    longitude,
     startDatetime,
     endDatetime,
     duration,
@@ -84,7 +92,11 @@ const createBookableTableDocument = async (
   }
 }
 
-const createRestaurantDocument = async (restaurantName) => {
+const createRestaurantDocument = async (
+  restaurantName,
+  latitude,
+  longitude,
+) => {
   try {
     const restaurantId = (
       await admin
@@ -92,6 +104,8 @@ const createRestaurantDocument = async (restaurantName) => {
         .collection('restaurants')
         .add({
           name: `${restaurantName}`,
+          latitude,
+          longitude,
           phone: `090-1234-3456`,
         })
     ).id
@@ -120,9 +134,11 @@ const main = async () => {
     endDatetime,
     duration,
     availableReservationRequests,
+    latitude,
+    longitude,
   } = prepareParams()
   let currentDatetime = startDatetime
-  const id = await createRestaurantDocument(restaurantName)
+  const id = await createRestaurantDocument(restaurantName, latitude, longitude)
   await createRestaurantAddressDocument(id)
 
   while (currentDatetime.isBefore(endDatetime)) {
