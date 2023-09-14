@@ -4,6 +4,7 @@ import {
   initializeTestEnvironment,
   RulesTestEnvironment,
   assertFails,
+  assertSucceeds,
 } from '@firebase/rules-unit-testing'
 
 import {
@@ -126,42 +127,65 @@ describe('restaurantsコレクション配下のドキュメントの取得', ()
       await assertFails(getDoc(docRef))
     })
   })
-  describe('サブコレクションのbookable_tablesの取得', () => {
+  describe('サブコレクションのbookable_tables', () => {
     const tableId = uuidv4()
 
-    beforeEach(async () => {
-      await testEnv.withSecurityRulesDisabled(async (context) => {
-        const admin = context.firestore()
-        const col = collection(
-          admin,
+    describe('ドキュメントの取得', () => {
+      beforeEach(async () => {
+        await testEnv.withSecurityRulesDisabled(async (context) => {
+          const admin = context.firestore()
+          const col = collection(
+            admin,
+            `${restaurantCollectionName}/${docId}/bookable_tables`,
+          )
+          const docRef = doc(col, tableId)
+          await setDoc(docRef, { availableReservationRequests: 4 })
+
+          return Promise.resolve()
+        })
+      })
+
+      it('認証済みで条件を満たす場合は可能', async () => {
+        const { clientDB } = getDB()
+        const testCol = collection(
+          clientDB,
           `${restaurantCollectionName}/${docId}/bookable_tables`,
         )
-        const docRef = doc(col, tableId)
-        await setDoc(docRef, { availableReservationRequests: 4 })
+        const docRef = doc(testCol, tableId)
+        const docSnap = await getDoc(docRef)
+        expect(docSnap.exists()).toBe(true)
+      })
 
-        return Promise.resolve()
+      it('認証してない場合は不可能', async () => {
+        const { guestClientDB } = getDB()
+        const testCol = collection(
+          guestClientDB,
+          `${restaurantCollectionName}/${docId}/bookable_tables`,
+        )
+        const docRef = doc(testCol, docId)
+        await assertFails(getDoc(docRef))
       })
     })
+    describe('ドキュメントの更新', () => {
+      it('認証済みで条件を満たす場合は可能', async () => {
+        const { clientDB } = getDB()
+        const testCol = collection(
+          clientDB,
+          `${restaurantCollectionName}/${docId}/bookable_tables`,
+        )
+        const docRef = doc(testCol, tableId)
+        await assertSucceeds(setDoc(docRef, { created_at: serverTimestamp() }))
+      })
 
-    it('認証済みで条件を満たす場合は可能', async () => {
-      const { clientDB } = getDB()
-      const testCol = collection(
-        clientDB,
-        `${restaurantCollectionName}/${docId}/bookable_tables`,
-      )
-      const docRef = doc(testCol, tableId)
-      const docSnap = await getDoc(docRef)
-      expect(docSnap.exists()).toBe(true)
-    })
-
-    it('認証してない場合は不可能', async () => {
-      const { guestClientDB } = getDB()
-      const testCol = collection(
-        guestClientDB,
-        `${restaurantCollectionName}/${docId}/bookable_tables`,
-      )
-      const docRef = doc(testCol, docId)
-      await assertFails(getDoc(docRef))
+      it('認証してない場合は不可能', async () => {
+        const { guestClientDB } = getDB()
+        const testCol = collection(
+          guestClientDB,
+          `${restaurantCollectionName}/${docId}/bookable_tables`,
+        )
+        const docRef = doc(testCol, tableId)
+        await assertFails(setDoc(docRef, { created_at: serverTimestamp() }))
+      })
     })
   })
 })
@@ -280,32 +304,6 @@ describe('operation_for_reservations', () => {
       const testCol = collection(guestClientDB, 'operation_for_reservations')
       const docRef = doc(testCol, docId)
       await assertFails(setDoc(docRef, { created_at: serverTimestamp() }))
-    })
-  })
-})
-
-describe('conds', () => {
-  describe('ドキュメントの取得', () => {
-    const operationForReservationName = 'conds'
-    const docId = uuidv4()
-
-    beforeEach(async () => {
-      await testEnv.withSecurityRulesDisabled(async (context) => {
-        const admin = context.firestore()
-        const col = collection(admin, operationForReservationName)
-        const docRef = doc(col, docId)
-        await setDoc(docRef, { created_at: serverTimestamp() })
-
-        return Promise.resolve()
-      })
-    })
-
-    it('認証済みで条件を満たす場合は可能', async () => {
-      const { clientDB } = getDB()
-      const testCol = collection(clientDB, 'conds')
-      const docRef = doc(testCol, docId)
-      const docSnap = await getDoc(docRef)
-      expect(docSnap.exists()).toBe(true)
     })
   })
 })

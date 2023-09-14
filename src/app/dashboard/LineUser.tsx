@@ -32,7 +32,10 @@ const LineUser = () => {
           <h1>LINEログイン済</h1>
           <p>uid: {user.uid}</p>
           <p>user: {user.displayName}</p>
-          <button type='button' onClick={() => router.push('/restaurants')}>
+          <button
+            type='button'
+            onClick={() => router.push('/liff/restaurants')}
+          >
             レストラン一覧を確認
           </button>
         </>
